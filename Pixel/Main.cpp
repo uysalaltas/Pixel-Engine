@@ -13,6 +13,10 @@
 #include "Camera.h"
 #include "Renderer.h"
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 float width = 720.0f;
 float height = 720.0f;
 
@@ -107,7 +111,6 @@ int main()
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
 	glViewport(0, 0, width, height);
-
 	// ------------------------------------------------------------------
 		
 	Shader shaderPlatform("Basic.shader");
@@ -133,11 +136,22 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
 	//glfwSetScrollCallback(window, scroll_callback);
 
+	// ------------------------- IMGUI -------------------------
+	const char* glsl_version = "#version 330";
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+	bool show_demo_window = true;
+	bool show_another_window = false;
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	// ---------------------------------------------------------
+
 	Renderer platform(vertices, indices);
 	Renderer cube(verticesCube, indicesCube);
 
 	//modelPlatform = glm::rotate(modelPlatform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	modelCube = glm::translate(modelCube, glm::vec3(0.0f, 0.0f, 0.0f));
+	glm::vec3 translation(0.0f, 0.0f, 0.0f);
 	proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 
 	while (!glfwWindowShouldClose(window))
@@ -145,6 +159,10 @@ int main()
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 		
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		platform.Clear();
@@ -157,14 +175,30 @@ int main()
 		shaderPlatform.SetUniformMat4f("u_MVP", mvpPlatform);
 		platform.DrawLine(shaderPlatform);
 
-		glm::mat4 mvpCube = modelCube * proj * view;
+		modelCube = glm::translate(glm::mat4(1.0f), translation);
+		glm::mat4 mvpCube = proj * view * modelCube;
 		shaderPlatform.SetUniform4f("u_Color", 0.0f, 0.8f, 0.2f, 1.0f);
 		shaderPlatform.SetUniformMat4f("u_MVP", mvpCube);
 		cube.DrawTriangle(shaderPlatform);
+
+		{
+			ImGui::Begin("Pixel Engine");	
+			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 1.0f);
+			ImGui::SameLine();
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
 		
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
