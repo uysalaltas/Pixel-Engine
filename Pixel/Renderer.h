@@ -9,8 +9,8 @@
 class Renderer
 {
 public:
-	Renderer(std::vector<glm::vec3> vertices, std::vector<glm::uvec4> indices);
-	Renderer(std::vector<glm::vec3> vertices, std::vector<glm::uvec3> indices);
+	Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
+	Renderer(std::vector<Vertex>& vertices, std::vector<glm::uvec3>& indices);
 
 	void Clear();
 	void DrawLine(const Shader& shader) const;
@@ -19,9 +19,8 @@ public:
 	//void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
 
 	VertexArray va;
-	float ib_size;
 
-	std::vector<glm::vec3> m_vertices;
-	std::vector<glm::uvec3> m_indices3;
+	std::vector<Vertex> m_vertices;
+	std::vector<GLuint> m_indices;
 	std::vector<glm::uvec4> m_indices4;
 };

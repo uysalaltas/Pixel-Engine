@@ -50,36 +50,37 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	std::vector<glm::vec3> verticesCube
+	std::vector<Vertex> verticesCube =
 	{
-		glm::vec3(-0.1f, -0.1f,  0.1f),
-		glm::vec3(0.1f, -0.1f,  0.1f),
-		glm::vec3(-0.1f,  0.1f,  0.1f),
-		glm::vec3(0.1f,  0.1f,  0.1f),
-		glm::vec3(-0.1f, -0.1f, -0.1f),
-		glm::vec3(0.1f, -0.1f, -0.1f),
-		glm::vec3(-0.1f,  0.1f, -0.1f),
-		glm::vec3(0.1f,  0.1f, -0.1f),
-	};	
-
-	std::vector<glm::uvec3> indicesCube
-	{
-		glm::vec3(2, 6, 7),
-		glm::vec3(2, 3, 7),
-		glm::vec3(0, 4, 5),
-		glm::vec3(0, 1, 5),
-		glm::vec3(0, 2, 6),
-		glm::vec3(0, 4, 6),
-		glm::vec3(1, 3, 7),
-		glm::vec3(1, 5, 7),
-		glm::vec3(0, 2, 3),
-		glm::vec3(0, 1, 3),
-		glm::vec3(4, 6, 7),
-		glm::vec3(4, 5, 7)
+		//               COORDINATES           /            COLORS          /           TexCoord         /       NORMALS         //
+		Vertex{glm::vec3(-0.1f, -0.1f,  0.1f),	glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(0.1f, -0.1f,  0.1f),	glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(-0.1f,  0.1f,  0.1f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(0.1f,  0.1f,  0.1f),	glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(-0.1f, -0.1f, -0.1f),	glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(0.1f, -0.1f, -0.1f),	glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(-0.1f,  0.1f, -0.1f),	glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(0.1f,  0.1f, -0.1f),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
 	};
 
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::uvec4> indices;
+	std::vector<GLuint> indicesCube
+	{
+		2, 6, 7,
+		2, 3, 7,
+		0, 4, 5,
+		0, 1, 5,
+		0, 2, 6,
+		0, 4, 6,
+		1, 3, 7,
+		1, 5, 7,
+		0, 2, 3,
+		0, 1, 3,
+		4, 6, 7,
+		4, 5, 7
+	};
+
+	std::vector<Vertex> vertices;
+	std::vector<GLuint> indices;
 	int slices = 10;
 
 	for (int j = 0; j <= slices; ++j) {
@@ -87,7 +88,8 @@ int main()
 			float x = (float)i / (float)slices;
 			float y = 0;
 			float z = (float)j / (float)slices;
-			vertices.push_back(glm::vec3(x, y, z));
+
+			vertices.push_back(Vertex{ glm::vec3(x, y, z), glm::vec3(0.8f, 0.3f, 0.02f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)});
 		}
 	}
 
@@ -97,8 +99,15 @@ int main()
 			int row1 = j * (slices + 1);
 			int row2 = (j + 1) * (slices + 1);
 
-			indices.push_back(glm::uvec4(row1 + i, row1 + i + 1, row1 + i + 1, row2 + i + 1));
-			indices.push_back(glm::uvec4(row2 + i + 1, row2 + i, row2 + i, row1 + i));
+			indices.push_back(row1 + i);
+			indices.push_back(row1 + i + 1);
+			indices.push_back(row1 + i + 1);
+			indices.push_back(row2 + i + 1);
+
+			indices.push_back(row2 + i + 1);
+			indices.push_back(row2 + i);
+			indices.push_back(row2 + i);
+			indices.push_back(row1 + i);
 		}
 	}
 
@@ -115,19 +124,7 @@ int main()
 		
 	Shader shaderPlatform("Basic.shader");
 	shaderPlatform.Bind();
-	shaderPlatform.SetUniform4f("u_Color", 0.8f, 0.3f, 0.02f, 1.0f);
-
-	//VertexArray va;
-	//va.Bind();
-	//VertexBuffer vb(vertices, sizeof(vertices));
-	//IndexBuffer ib(indices, sizeof(indices));	
-	//VertexBuffer vb(glm::value_ptr(vertices[0]), vertices.size() * sizeof(glm::vec3));
-	//IndexBuffer ib(glm::value_ptr(indices[0]), indices.size() * sizeof(glm::uvec4));
-	//va.AddBuffer(vb, 0);
-	//shader.Unbind();
-	//va.Unbind();
-	//ib.Unbind();
-	//vb.Unbind();
+	//shaderPlatform.SetUniform4f("u_Color", 0.8f, 0.3f, 0.02f, 1.0f);
 
 	bool firstClick = true;
 	glEnable(GL_DEPTH_TEST);
@@ -148,6 +145,7 @@ int main()
 	// ---------------------------------------------------------
 
 	Renderer platform(vertices, indices);
+	//std::vector <Vertex> verts(verticesCube, verticesCube + sizeof(verticesCube) / sizeof(Vertex));
 	Renderer cube(verticesCube, indicesCube);
 
 	//modelPlatform = glm::rotate(modelPlatform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -171,13 +169,11 @@ int main()
 		view = camera.GetViewMatrix();
 
 		glm::mat4 mvpPlatform = proj * view * modelPlatform;
-		shaderPlatform.SetUniform4f("u_Color", 0.8f, 0.3f, 0.02f, 1.0f);
 		shaderPlatform.SetUniformMat4f("u_MVP", mvpPlatform);
 		platform.DrawLine(shaderPlatform);
 
 		modelCube = glm::translate(glm::mat4(1.0f), translation);
 		glm::mat4 mvpCube = proj * view * modelCube;
-		shaderPlatform.SetUniform4f("u_Color", 0.0f, 0.8f, 0.2f, 1.0f);
 		shaderPlatform.SetUniformMat4f("u_MVP", mvpCube);
 		cube.DrawTriangle(shaderPlatform);
 
