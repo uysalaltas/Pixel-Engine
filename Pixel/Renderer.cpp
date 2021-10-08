@@ -1,5 +1,5 @@
 #include "Renderer.h"
-
+#include <glm/gtx/string_cast.hpp>
 
 Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
 	: m_vertices(vertices)
@@ -7,8 +7,8 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
 {
 	va.Bind();
 
-	VertexBuffer vb(vertices);
-	IndexBuffer ib(indices);
+	VertexBuffer vb(m_vertices);
+	IndexBuffer ib(m_indices);
 
 	va.AddBuffer(vb, 0, 3, sizeof(Vertex), (void*)0);
 	va.AddBuffer(vb, 1, 3, sizeof(Vertex), (void*)(3 * sizeof(float)));
@@ -19,6 +19,11 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
 	ib.Unbind();
 	vb.Unbind();
 }
+
+//void Renderer::Setup(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
+//{
+//
+//}
 
 //Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<glm::uvec3>& indices)
 //	: m_vertices(vertices)

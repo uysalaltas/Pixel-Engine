@@ -6,21 +6,27 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 
+struct MeshData
+{
+	std::vector<Vertex> meshVertices;
+	std::vector<GLuint> meshIndices;
+};
+
 class Renderer
 {
 public:
+	std::vector<Vertex> m_vertices;
+	std::vector<GLuint> m_indices;
+
 	Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
-	Renderer(std::vector<Vertex>& vertices, std::vector<glm::uvec3>& indices);
 
 	void Clear();
 	void DrawLine(const Shader& shader) const;
 	void DrawTriangle(const Shader& shader) const;
 
 	//void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	//void Setup(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
 
+private:
 	VertexArray va;
-
-	std::vector<Vertex> m_vertices;
-	std::vector<GLuint> m_indices;
-	std::vector<glm::uvec4> m_indices4;
 };

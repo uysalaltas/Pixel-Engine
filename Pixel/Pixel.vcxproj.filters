@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\ImGui">
       <UniqueIdentifier>{bbc30ae5-106c-45e6-9e65-137130dacf21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Models">
+      <UniqueIdentifier>{7395c5f7-85b5-4102-87a7-5b8fb1afbe7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -63,10 +66,19 @@
     <ClCompile Include="Libraries\include\imgui\imgui_impl_opengl3.cpp">
       <Filter>Resource Files\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.shader">
       <Filter>Resource Files\Shader</Filter>
+    </None>
+    <None Include="Models\cube.glb">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="Models\cube.stl">
+      <Filter>Resource Files\Models</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="Libraries\include\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Resource Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
