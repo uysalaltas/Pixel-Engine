@@ -5,27 +5,24 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-
-struct MeshData
-{
-	std::vector<Vertex> meshVertices;
-	std::vector<GLuint> meshIndices;
-};
+#include "Texture.h"
 
 class Renderer
 {
 public:
 	std::vector<Vertex> m_vertices;
 	std::vector<GLuint> m_indices;
+	std::vector<Texture> m_textures;
 
-	Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
+	Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture> textures);
+	~Renderer()
+	{
+		std::cout << "Renderer Deconstructor" << std::endl;
+	}
 
 	void Clear();
-	void DrawLine(const Shader& shader) const;
-	void DrawTriangle(const Shader& shader) const;
-
-	//void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-	//void Setup(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
+	void DrawLine(Shader& shader);
+	void DrawTriangle(Shader& shader);
 
 private:
 	VertexArray va;

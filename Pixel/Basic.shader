@@ -2,7 +2,7 @@
 #version 330 core
 
 layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aColor;
+layout(location = 1) in vec3 aColor;	
 layout(location = 2) in vec3 aNormal;
 layout(location = 3) in vec2 aTex;
 
@@ -12,7 +12,6 @@ out vec3 Normal;
 out vec2 texCoord;
 
 uniform mat4 u_MVP;
-uniform mat4 model;
 
 void main()
 {
@@ -27,16 +26,17 @@ void main()
 #shader fragment
 #version 330 core
 
-out vec3 FragColor;
+out vec4 FragColor;
 
 in vec3 crntPos;
 in vec3 color;
 in vec3 Normal;
 in vec2 texCoord;
 
-uniform vec4 u_Color;
+uniform sampler2D texture_diffuse0;
 
 void main()
 {
-   FragColor = color;
+	vec4 texColor = texture(texture_diffuse0, texCoord);
+	FragColor = texColor;
 };

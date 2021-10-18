@@ -2,63 +2,27 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-std::vector<Vertex> verticesCube =
-{
-    Vertex{glm::vec3(1  ,  1  ,-1),	glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(1  ,  1  ,-1),	glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-    Vertex{glm::vec3(1  ,  1  ,-1),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-    Vertex{glm::vec3(1  , -1  ,-1),	glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  , -1  ,-1),	glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  , -1  ,-1),	glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  ,  1  ,1),	glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  ,  1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  ,  1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(1  , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,-1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 ,  1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3(-1 , -1  ,1),	glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
-};
-std::vector<GLuint> indicesCube
-{
-    1,14,20,1,20,7,10,6,19,10,19,23,21,18,12,21,12,15,16,3,9,16,9,22,5,2,8,5,8,11,17,13,0,17,0,4
-};
-
 
 Model::Model(std::string path)
 {
 	loadModel(path);
 }
 
+Model::~Model()
+{
+    std::cout << "Model Deconstructor" << std::endl;
+    for (int i = 0; i < meshes.size(); i++)
+    {
+        delete meshes[i];
+    }
+}
+
 void Model::Draw(Shader& shader)
 {
-    //if (firstLoop)
-    //{
-    //    firstLoop = false;
-    //}
-
-    for (int i = 0; i < meshesData.size(); i++)
+    for (int i = 0; i < meshes.size(); i++)
     {
-        //Memory Leak here
-        //Renderer r = Renderer(meshesData[i].meshVertices, meshesData[i].meshIndices);
-        //meshes.push_back(r);
-        //r.DrawTriangle(shader);
+        meshes[i]->DrawTriangle(shader);
     }
-
-	//for (int i = 0; i < meshes.size(); i++) 
-	//{
- //       meshes[i].DrawTriangle(shader);
-	//}
 }
 
 void Model::loadModel(std::string path)
@@ -78,11 +42,10 @@ void Model::loadModel(std::string path)
 
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
-
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshesData.push_back(processMesh(mesh, scene));
+        meshes.push_back(processMesh(mesh, scene));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -91,12 +54,12 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     }
 }
 
-MeshData Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     // data to fill
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    //std::vector<Texture> textures;
+    std::vector<Texture> textures;
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -108,7 +71,7 @@ MeshData Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
-        //vertex.color.x = 0.0f;
+        //vertex.color.x = 1.0f;
         //vertex.color.y = 1.0f;
         //vertex.color.z = 1.0f;
 
@@ -157,22 +120,51 @@ MeshData Model::processMesh(aiMesh* mesh, const aiScene* scene)
     
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    //// 1. diffuse maps
-    //std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-    //textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    //// 2. specular maps
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    std::cout << "texture_diffuse " << diffuseMaps.size() << std::endl;
+    
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     //std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    ////std::cout << "texture_specular " << specularMaps.size() << std::endl;
     //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    //// 3. normal maps
     //std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    ////std::cout << "texture_normal " << normalMaps.size() << std::endl;
     //textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    //// 4. height maps
     //std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    ////std::cout << "texture_height " << heightMaps.size() << std::endl;
     //textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
     
-    MeshData meshData;
-    meshData.meshVertices = vertices;
-    meshData.meshIndices = indices;
-    
-    return meshData;
+    return new Renderer(vertices, indices, textures);
+}
+
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+{
+    std::vector<Texture> textures;
+
+    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+    {
+        aiString str;
+        mat->GetTexture(type, i, &str);
+        bool skip = false;
+
+        for (unsigned int j = 0; j < textures_loaded.size(); j++)
+        {
+            //if (std::strcmp(textures_loaded[j].path, str.C_Str()) == 0)
+            //{
+            //    std::cout << "SAME PATH " << std::endl;
+            //    textures.push_back(textures_loaded[j]);
+            //    skip = true;
+            //    break;
+            //}
+        }
+        if (!skip)
+        {
+            Texture texture(str.C_Str(), typeName.c_str(), i);
+            
+            textures.push_back(texture);
+            //textures_loaded.push_back(texture);
+        }
+    }
+
+    return textures;
 }

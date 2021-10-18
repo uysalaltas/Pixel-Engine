@@ -152,7 +152,7 @@ int main()
 	//modelPlatform = glm::rotate(modelPlatform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::vec3 translation(0.0f, 0.0f, 0.0f);
 	proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-	Model cubeModel("Models/cube.stl");
+	Model cubeModel("Models/scene.gltf");
 			
 	while (!glfwWindowShouldClose(window))
 	{
@@ -180,13 +180,11 @@ int main()
 		glm::mat4 mvpCube = proj * view * modelCube;
 		shaderPlatform.SetUniformMat4f("u_MVP", mvpCube);
 		//cube.DrawTriangle(shaderPlatform);
-		
 		cubeModel.Draw(shaderPlatform);
 
 		{
 			ImGui::Begin("Pixel Engine");	
 			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 1.0f);
-			//ImGui::SameLine();
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
