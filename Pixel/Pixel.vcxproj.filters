@@ -86,6 +86,9 @@
     <None Include="Models\cube.stl">
       <Filter>Resource Files\Models</Filter>
     </None>
+    <None Include="Platform.shader">
+      <Filter>Resource Files\Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

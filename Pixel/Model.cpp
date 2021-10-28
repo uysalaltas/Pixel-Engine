@@ -71,9 +71,9 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
-        //vertex.color.x = 1.0f;
-        //vertex.color.y = 1.0f;
-        //vertex.color.z = 1.0f;
+        vertex.color.x = 1.0f;
+        vertex.color.y = 1.0f;
+        vertex.color.z = 1.0f;
 
         // normals
         if (mesh->HasNormals())
@@ -121,19 +121,14 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
     std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-    std::cout << "texture_diffuse " << diffuseMaps.size() << std::endl;
-    
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    //std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-    ////std::cout << "texture_specular " << specularMaps.size() << std::endl;
-    //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    //std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-    ////std::cout << "texture_normal " << normalMaps.size() << std::endl;
-    //textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    //std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-    ////std::cout << "texture_height " << heightMaps.size() << std::endl;
-    //textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-    
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+        
     return new Renderer(vertices, indices, textures);
 }
 
@@ -149,20 +144,20 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
         for (unsigned int j = 0; j < textures_loaded.size(); j++)
         {
-            //if (std::strcmp(textures_loaded[j].path, str.C_Str()) == 0)
-            //{
-            //    std::cout << "SAME PATH " << std::endl;
-            //    textures.push_back(textures_loaded[j]);
-            //    skip = true;
-            //    break;
-            //}
+            if (std::strcmp(textures_loaded[j].path.c_str(), str.C_Str()) == 0)
+            {
+                std::cout << "SAME PATH " << std::endl;
+                textures.push_back(textures_loaded[j]);
+                skip = true;
+                break;
+            }
         }
         if (!skip)
         {
             Texture texture(str.C_Str(), typeName.c_str(), i);
             
             textures.push_back(texture);
-            //textures_loaded.push_back(texture);
+            textures_loaded.push_back(texture);
         }
     }
 

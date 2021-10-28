@@ -42,6 +42,7 @@ public:
     glm::vec3 GetLookAt() const { return m_lookAt; }
     glm::vec3 GetViewDir() const { return -glm::transpose(m_viewMatrix)[2]; }
     glm::vec3 GetRightVector() const { return glm::transpose(m_viewMatrix)[0]; }
+    float GetFOV() const { return m_fov; }
 
     void UpdateViewMatrix()
     {
@@ -80,6 +81,15 @@ public:
         SetCameraView(finalPosition, GetLookAt(), m_upVector);
     }
 
+    void ProcessMouseScroll(float yoffset)
+    {
+        m_fov -= (float)yoffset;
+        if (m_fov < 1.0f)
+            m_fov = 1.0f;
+        if (m_fov > 45.0f)
+            m_fov = 45.0f;
+    }
+
     //// processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     //void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     //{
@@ -104,16 +114,6 @@ public:
     //    UpdateViewMatrix();
     //    std::cout << glm::to_string(m_eye) << std::endl;
     //}
-    //// processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    //void ProcessMouseScroll(float yoffset)
-    //{
-    //    printf("Whell\n");
-    //    Zoom -= (float)yoffset;
-    //    if (Zoom < 1.0f)
-    //        Zoom = 1.0f;
-    //    if (Zoom > 45.0f)
-    //        Zoom = 45.0f;
-    //}
 
 private:
     glm::mat4x4 m_viewMatrix;
@@ -122,5 +122,6 @@ private:
     glm::vec3 m_upVector;           // Orientation of the camera
     float m_width;
     float m_height;
+    float m_fov = 45;
 };
 #endif

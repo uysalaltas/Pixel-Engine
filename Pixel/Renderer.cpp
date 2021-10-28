@@ -4,7 +4,7 @@
 Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture> textures)
 	: m_vertices(vertices)
 	, m_indices(indices)
-	//, m_textures(textures)
+	, m_textures(textures)
 {
 	va.Bind();
 	std::cout << "Renderer Constructor" << std::endl;
