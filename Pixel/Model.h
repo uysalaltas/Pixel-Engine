@@ -10,14 +10,16 @@
 class Model
 {
 public:
-	Model(std::string path);
+	Model(std::string path, glm::vec3 modelColor);
 	~Model();
-	void Draw(Shader& shader);
+	void Draw(Shader& shader, GLenum mode);
 
 private:
 	std::string directory;
 	std::vector<Renderer*> meshes;
 	std::vector<Texture> textures_loaded;
+
+	glm::vec3 colorData = glm::vec3(1.0f);
 
 	void loadModel(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);

@@ -3,8 +3,9 @@
 #include <glm/gtx/string_cast.hpp>
 
 
-Model::Model(std::string path)
+Model::Model(std::string path, glm::vec3 modelColor)
 {
+    colorData = modelColor;
 	loadModel(path);
 }
 
@@ -17,8 +18,10 @@ Model::~Model()
     }
 }
 
-void Model::Draw(Shader& shader)
+void Model::Draw(Shader& shader, GLenum mode)
 {
+    glPolygonMode(GL_FRONT_AND_BACK, mode);
+
     for (int i = 0; i < meshes.size(); i++)
     {
         meshes[i]->DrawTriangle(shader);
@@ -71,9 +74,9 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
-        vertex.color.x = 1.0f;
-        vertex.color.y = 1.0f;
-        vertex.color.z = 1.0f;
+        vertex.color.x = colorData.x;
+        vertex.color.y = colorData.y;
+        vertex.color.z = colorData.z;
 
         // normals
         if (mesh->HasNormals())

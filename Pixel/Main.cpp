@@ -19,39 +19,39 @@
 #include "Model.h"
 
 
-float width = 720.0f;
-float height = 720.0f;
+const float WIDTH = 720.0f;
+const float HEIGHT = 720.0f;
+float platfromSize = 200.0f;
 
-float lastX = width / 2.0f;
-float lastY = height / 2.0f;
-bool firstMouse = true;
+bool firstMouseClick = true;
+glm::vec2 lastMousePosRightClick = glm::vec2(0.0f, 0.0f);
+glm::vec2 currentMousePosClick = glm::vec2(0.0f, 0.0f);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
 //void keyboard_callback(GLFWwindow* window);
-//glm::vec3 get_arcball_vector(int x, int y);
 
-float platfromSize = 200.0f;
-glm::vec2 centerPoint = glm::vec2(platfromSize/2, platfromSize/2);
-
-glm::vec3 m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec2 m_lastMousePos = glm::vec2(0.0f, 0.0f);
+glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
+glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
 
 Camera camera(
 	glm::vec3(0.0f, 0.0f, platfromSize * 3), 
-	glm::vec3(centerPoint.x, 0.0f, centerPoint.y),
-	m_upVector, width, height
+	glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
+	upVector, WIDTH, HEIGHT
 );
 
+glm::mat4 proj = glm::mat4(1.0f);
 glm::mat4 view = glm::mat4(1.0f);
 glm::mat4 modelPlatform = glm::mat4(1.0f);
 glm::mat4 modelCube = glm::mat4(1.0f);
-glm::mat4 proj = glm::mat4(1.0f);
+glm::mat4 modelShape = glm::mat4(1.0f);
+
+int selectedObj = -1;
+std::vector<glm::vec4*> objectPositions;
 
 int main()
 {
-	// -------------------------OPENGL FUNCTIONS-------------------------
+#pragma region OPENGL_SCENE_INIT
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -79,8 +79,8 @@ int main()
 	for (int j = 0; j <= slices; ++j) {
 		for (int i = 0; i <= slices; ++i) {
 			float x = (float)i * 10;
-			float y = 0;
-			float z = (float)j * 10;
+			float y = (float)j * 10;
+			float z = 0;
 
 			vertices.push_back(
 				Vertex{ 
@@ -108,7 +108,7 @@ int main()
 		}
 	}
 
-	GLFWwindow* window = glfwCreateWindow(width, height, "Pixel Slicer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Pixel Slicer", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -117,20 +117,19 @@ int main()
 
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
-	glViewport(0, 0, width, height);
-	// ------------------------------------------------------------------
-		
-	Shader shaderBasic("Basic.shader");
-	//shaderBasic.Bind();
-
-	bool firstClick = true;
+	glViewport(0, 0, WIDTH, HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 
-	glfwSetCursorPos(window, (width / 2), (height / 2));
+	std::vector<Texture> tempTexture;
+	Renderer platform(vertices, indices, tempTexture);
+	Renderer axis(verticesAxis, indicesAxis, tempTexture);
+
+	glfwSetCursorPos(window, (WIDTH / 2), (HEIGHT / 2));
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+#pragma endregion
 
-	// ------------------------- IMGUI -------------------------
+#pragma region IMGUI
 	const char* glsl_version = "#version 330";
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -139,16 +138,22 @@ int main()
 	bool show_demo_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	// ---------------------------------------------------------
+#pragma endregion
 
-	std::vector<Texture> tempTexture;
-	Renderer platform(vertices, indices, tempTexture);
-	//modelPlatform = glm::rotate(modelPlatform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	
-	Renderer axis(verticesAxis, indicesAxis, tempTexture);
+	Shader shaderBasic("Basic.shader");
+	//shaderBasic.Bind();
 
 	glm::vec3 translation(0.0f, 0.0f, 0.0f);
-	Model cubeModel("Models/boat.stl");
+	glm::vec3 rotation(0.0f, 0.0f, 0.0f);
+
+	Model cubeModel("Models/cube.stl", glm::vec3(1.0f, 0.2f, 1.0f));
+	Model cubeModelLine("Models/cube.stl", glm::vec3(0.2f, 0.2f, 0.2f));
+
+	Model simpleModel("Models/charmender.stl", glm::vec3(1.0f, 1.0f, 0.2f));
+	Model simpleModelLine("Models/charmender.stl", glm::vec3(0.2f, 0.2f, 0.2f));
+
+	objectPositions.push_back(&modelCube[3]);
+	objectPositions.push_back(&modelShape[3]);
 			
 	while (!glfwWindowShouldClose(window))
 	{
@@ -158,32 +163,81 @@ int main()
 		
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		platform.Clear();
-		axis.Clear();
+		
+		{
+			platform.Clear();
+			axis.Clear();
 
-		proj = glm::perspective(glm::radians(camera.GetFOV()), (float)width / (float)height, 0.1f, platfromSize * 20);
-		view = camera.GetViewMatrix();
-
-		glm::mat4 mvpAxisLine = proj * view * modelPlatform;
-		shaderBasic.SetUniformMat4f("u_MVP", mvpAxisLine);
-		axis.DrawLine(shaderBasic);
-
-		glm::mat4 mvpPlatform = proj * view * modelPlatform;
-		shaderBasic.SetUniformMat4f("u_MVP", mvpPlatform);
-		platform.DrawLine(shaderBasic);
+			proj = glm::perspective(glm::radians(camera.GetFOV()), (float)WIDTH / (float)HEIGHT, 0.1f, platfromSize * 20);
+			view = camera.GetViewMatrix();
+			
+			glm::mat4 mvpAxisLine = proj * view * modelPlatform;
+			shaderBasic.SetUniformMat4f("u_MVP", mvpAxisLine);
+			axis.DrawLine(shaderBasic);
+			
+			glm::mat4 mvpPlatform = proj * view * modelPlatform;
+			shaderBasic.SetUniformMat4f("u_MVP", mvpPlatform);
+			platform.DrawLine(shaderBasic);
+		}
 
 		modelCube = glm::translate(glm::mat4(1.0f), translation);
+		modelCube = glm::rotate(modelCube, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelCube = glm::rotate(modelCube, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCube = glm::rotate(modelCube, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		
 		glm::mat4 mvpCube = proj * view * modelCube;
 		shaderBasic.SetUniformMat4f("u_MVP", mvpCube);
-		cubeModel.Draw(shaderBasic);
+		cubeModelLine.Draw(shaderBasic, GL_LINE);
+		cubeModel.Draw(shaderBasic, GL_FILL);
+
+		glm::mat4 mvpSimple = proj * view * modelShape;
+		shaderBasic.SetUniformMat4f("u_MVP", mvpSimple);
+		simpleModelLine.Draw(shaderBasic, GL_LINE);
+		simpleModel.Draw(shaderBasic, GL_FILL);
 
 		{
 			ImGui::Begin("Pixel Engine");	
 			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 200.0f);
+			ImGui::SliderFloat3("Rotation", &rotation.x, 0, 360);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
-		
+
+		{
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+				float winZ;
+				glReadPixels(currentMousePosClick.x, HEIGHT - currentMousePosClick.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+				glm::vec3 objPt = glm::unProject(
+					glm::vec3(currentMousePosClick.x, HEIGHT - currentMousePosClick.y, winZ),
+					view,
+					proj,
+					glm::vec4(0, 0, WIDTH, HEIGHT)
+				);
+
+				size_t i = 0;
+				float minDist = 1000;
+				selectedObj = -1;
+
+				std::cout << glm::to_string(objPt) << std::endl;
+
+				for (i = 0; i < objectPositions.size(); i++) {
+					glm::vec3 objectDistance = glm::vec3(
+						objectPositions[i]->x,
+						objectPositions[i]->y, 
+						objectPositions[i]->z 
+					);
+
+					float dist = glm::distance(objectDistance, objPt);
+					std::cout << dist << i << std::endl;
+
+					if (dist < 200 && dist < minDist) {
+						selectedObj = i;
+						minDist = dist;
+					}
+				}
+			}
+		}
+
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
@@ -202,22 +256,26 @@ int main()
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	currentMousePosClick.x = xpos;
+	currentMousePosClick.y = ypos;
+
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
-		if (firstMouse)
+		if (firstMouseClick)
 		{
-			m_lastMousePos.x = xpos;
-			m_lastMousePos.y = ypos;
-			firstMouse = false;
+			lastMousePosRightClick.x = xpos;
+			lastMousePosRightClick.y = ypos;
+			firstMouseClick = false;
 
 		}
-		camera.ArcBallCamera((m_lastMousePos.x - xpos), (m_lastMousePos.y - ypos));
-		m_lastMousePos.x = xpos;
-		m_lastMousePos.y = ypos;
+
+		camera.ArcBallCamera((lastMousePosRightClick.x - xpos), (lastMousePosRightClick.y - ypos));
+		lastMousePosRightClick.x = xpos;
+		lastMousePosRightClick.y = ypos;
 	}
 	else 
 	{
-		firstMouse = true;
+		firstMouseClick = true;
 	}
 }
 
@@ -238,13 +296,25 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 //		camera.ProcessKeyboard(RIGHT, deltaTime);
 //}
 
-//glm::vec3 get_arcball_vector(int x, int y) {
-//	glm::vec3 P = glm::vec3(1.0 * x / width * 2 - 1.0, 1.0 * y / height * 2 - 1.0, 0);
-//	P.y = -P.y;
-//	float OP_squared = P.x * P.x + P.y * P.y;
-//	if (OP_squared <= 1 * 1)
-//		P.z = sqrt(1 * 1 - OP_squared);
-//	else
-//		P = glm::normalize(P);
-//	return P;
+//void ScreenPosToRay(
+//	int mouseX, int mouseY,
+//	glm::mat4 projMatrix,
+//	glm::mat4 viewMatrix
+//)
+//{
+//	float x = (2.0f * mouseX) / WIDTH - 1.0f;
+//	float y = 1.0f - (2.0f * mouseY) / HEIGHT;
+//	float z = 1.0f;
+//	glm::vec3 ray_nds = glm::vec3(x, y, z);
+//	glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+//	glm::vec4 ray_eye = glm::inverse(projMatrix) * ray_clip;
+//	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+//
+//	glm::vec3 ray_wor = glm::vec3(
+//		(glm::inverse(viewMatrix) * ray_eye).x,
+//		(glm::inverse(viewMatrix) * ray_eye).y,
+//		(glm::inverse(viewMatrix) * ray_eye).z
+//	);
+//
+//	ray_wor = glm::normalize(ray_wor);
 //}
