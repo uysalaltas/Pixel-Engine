@@ -22,6 +22,9 @@
     <Filter Include="Resource Files\Models">
       <UniqueIdentifier>{7395c5f7-85b5-4102-87a7-5b8fb1afbe7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\ImGuizmo">
+      <UniqueIdentifier>{0d0233c4-b634-44ce-a15a-4a28ffeaf9d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -73,6 +76,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\include\imgui\ImGuizmo.cpp">
+      <Filter>Resource Files\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,6 +152,12 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\include\imgui\ImGuizmo.h">
+      <Filter>Resource Files\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

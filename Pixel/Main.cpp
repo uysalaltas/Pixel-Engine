@@ -9,6 +9,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/ImGuizmo.h>
 
 #include "Shader.h"
 #include "IndexBuffer.h"
@@ -17,9 +18,9 @@
 #include "Camera.h"
 #include "Renderer.h"
 #include "Model.h"
+#include "FrameBuffer.h"
 
-
-const float WIDTH = 720.0f;
+const float WIDTH = 1280.0f;
 const float HEIGHT = 720.0f;
 float platfromSize = 200.0f;
 
@@ -29,6 +30,7 @@ glm::vec2 currentMousePosClick = glm::vec2(0.0f, 0.0f);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void create_translation_rotation(std::vector<glm::vec3>& translations, std::vector<glm::vec3>& rotations);
 //void keyboard_callback(GLFWwindow* window);
 
 glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
@@ -46,8 +48,10 @@ glm::mat4 modelPlatform = glm::mat4(1.0f);
 glm::mat4 modelCube = glm::mat4(1.0f);
 glm::mat4 modelShape = glm::mat4(1.0f);
 
-int selectedObj = -1;
+int selectedObj = 0;
 std::vector<glm::vec4*> objectPositions;
+std::vector<glm::vec3> translations;
+std::vector<glm::vec3> rotations;
 
 int main()
 {
@@ -127,6 +131,8 @@ int main()
 	glfwSetCursorPos(window, (WIDTH / 2), (HEIGHT / 2));
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+
+
 #pragma endregion
 
 #pragma region IMGUI
@@ -143,9 +149,6 @@ int main()
 	Shader shaderBasic("Basic.shader");
 	//shaderBasic.Bind();
 
-	glm::vec3 translation(0.0f, 0.0f, 0.0f);
-	glm::vec3 rotation(0.0f, 0.0f, 0.0f);
-
 	Model cubeModel("Models/cube.stl", glm::vec3(1.0f, 0.2f, 1.0f));
 	Model cubeModelLine("Models/cube.stl", glm::vec3(0.2f, 0.2f, 0.2f));
 
@@ -154,13 +157,24 @@ int main()
 
 	objectPositions.push_back(&modelCube[3]);
 	objectPositions.push_back(&modelShape[3]);
-			
+
+	create_translation_rotation(translations, rotations);
+	create_translation_rotation(translations, rotations);
+
+	FrameBuffer sceneBuffer(WIDTH, HEIGHT);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		
+
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::BeginFrame();
+
+		sceneBuffer.Bind();
+		glEnable(GL_DEPTH_TEST);
+
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -180,31 +194,60 @@ int main()
 			platform.DrawLine(shaderBasic);
 		}
 
-		modelCube = glm::translate(glm::mat4(1.0f), translation);
-		modelCube = glm::rotate(modelCube, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelCube = glm::rotate(modelCube, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelCube = glm::rotate(modelCube, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		
+		modelCube = glm::translate(glm::mat4(1.0f), translations[0]);
+		modelCube = glm::rotate(modelCube, glm::radians(rotations[0].x), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelCube = glm::rotate(modelCube, glm::radians(rotations[0].y), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCube = glm::rotate(modelCube, glm::radians(rotations[0].z), glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 mvpCube = proj * view * modelCube;
 		shaderBasic.SetUniformMat4f("u_MVP", mvpCube);
 		cubeModelLine.Draw(shaderBasic, GL_LINE);
 		cubeModel.Draw(shaderBasic, GL_FILL);
 
+		modelShape = glm::translate(glm::mat4(1.0f), translations[1]);
+		modelShape = glm::rotate(modelShape, glm::radians(rotations[1].x), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelShape = glm::rotate(modelShape, glm::radians(rotations[1].y), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelShape = glm::rotate(modelShape, glm::radians(rotations[1].z), glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 mvpSimple = proj * view * modelShape;
 		shaderBasic.SetUniformMat4f("u_MVP", mvpSimple);
 		simpleModelLine.Draw(shaderBasic, GL_LINE);
 		simpleModel.Draw(shaderBasic, GL_FILL);
 
+		sceneBuffer.Unbind();
+		glDisable(GL_DEPTH_TEST);
+		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		{
 			ImGui::Begin("Pixel Engine");	
-			ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 200.0f);
-			ImGui::SliderFloat3("Rotation", &rotation.x, 0, 360);
+			ImGui::SliderFloat3("Translation", &translations[selectedObj].x, 0.0f, 200.0f);
+			ImGui::SliderFloat3("Rotation", &rotations[selectedObj].x, 0, 360);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
+			
+			ImGui::SetNextWindowSize(ImVec2(WIDTH*0.6f, HEIGHT*0.6f));
+			ImGui::Begin("Scene");
+			unsigned int frameTexture = sceneBuffer.getFrameTexture();
+			ImGui::Image((ImTextureID)frameTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
+
+			ImGuizmo::SetDrawlist();
+			float windowWidth = (float)ImGui::GetWindowWidth();
+			float windowHeight = (float)ImGui::GetWindowHeight();
+			float windowPosX = ImGui::GetWindowPos().x;
+			float windowPosY = ImGui::GetWindowPos().y;
+
+			ImGuizmo::SetRect(windowPosX, windowPosY, windowWidth, windowHeight);
+			ImGuizmo::Manipulate(
+				glm::value_ptr(view),
+				glm::value_ptr(proj),
+				ImGuizmo::OPERATION::TRANSLATE,
+				ImGuizmo::MODE::LOCAL,
+				glm::value_ptr(modelCube)
+			);
+			ImGui::End(); 
 		}
 
 		{
-			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
 				float winZ;
 				glReadPixels(currentMousePosClick.x, HEIGHT - currentMousePosClick.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 				glm::vec3 objPt = glm::unProject(
@@ -218,7 +261,7 @@ int main()
 				float minDist = 1000;
 				selectedObj = -1;
 
-				std::cout << glm::to_string(objPt) << std::endl;
+				//std::cout << glm::to_string(objPt) << std::endl;
 
 				for (i = 0; i < objectPositions.size(); i++) {
 					glm::vec3 objectDistance = glm::vec3(
@@ -228,18 +271,21 @@ int main()
 					);
 
 					float dist = glm::distance(objectDistance, objPt);
-					std::cout << dist << i << std::endl;
+					//std::cout << dist << i << std::endl;
 
 					if (dist < 200 && dist < minDist) {
 						selectedObj = i;
 						minDist = dist;
 					}
 				}
+
+				std::cout << selectedObj << i << std::endl;
 			}
 		}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -282,6 +328,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
+}
+
+void create_translation_rotation(std::vector<glm::vec3>& translations, std::vector<glm::vec3>& rotations)
+{
+	translations.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	rotations.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 //void keyboard_callback(GLFWwindow* window)
