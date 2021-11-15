@@ -84,6 +84,9 @@
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UiView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.shader">
@@ -158,6 +161,9 @@
       <Filter>Resource Files\ImGuizmo</Filter>
     </ClInclude>
     <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UiView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
