@@ -20,6 +20,7 @@
 #include "Model.h"
 #include "FrameBuffer.h"
 #include "UiView.h"
+#include "Object.h"
 
 const float WIDTH = 720.0f;
 const float HEIGHT = 720.0f;
@@ -45,11 +46,9 @@ Camera camera(
 glm::mat4 proj = glm::mat4(1.0f);
 glm::mat4 view = glm::mat4(1.0f);
 glm::mat4 modelPlatform = glm::mat4(1.0f);
-glm::mat4 modelCube = glm::mat4(1.0f);
-glm::mat4 modelShape = glm::mat4(1.0f);
 
-int selectedObj = 0;
-std::vector<glm::vec4*> objectPositions;
+std::vector<ObjectStructure> objectStructures;
+std::vector<std::vector<Model*>> objectModels;
 
 int main()
 {
@@ -134,40 +133,23 @@ int main()
 #pragma endregion
 
 #pragma region IMGUI
-	//const char* glsl_version = "#version 330";
-	//ImGui::CreateContext();
-	//ImGui::StyleColorsDark();
-	//ImGui_ImplGlfw_InitForOpenGL(window, true);
-	//ImGui_ImplOpenGL3_Init(glsl_version);
-	//bool show_demo_window = true;
-	//bool show_another_window = false;
-	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
 	UiView uiView(window, WIDTH, HEIGHT);
 #pragma endregion
 
 	Shader shaderBasic("Basic.shader");
 	//shaderBasic.Bind();
 
-	Model cubeModel("Models/cube.stl", glm::vec3(1.0f, 0.2f, 1.0f));
-	Model cubeModelLine("Models/cube.stl", glm::vec3(0.2f, 0.2f, 0.2f));
+	ObjectStructure cube;
+	cube.path = "Models/cube.stl";
+	cube.modelColor = glm::vec3(1.0f, 0.2f, 1.0f);
+	cube.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
 
-	Model simpleModel("Models/charmender.stl", glm::vec3(1.0f, 1.0f, 0.2f));
-	Model simpleModelLine("Models/charmender.stl", glm::vec3(0.2f, 0.2f, 0.2f));
-
-	objectPositions.push_back(&modelCube[3]);
-	objectPositions.push_back(&modelShape[3]);
+	objectStructures.push_back(cube);
 
 	FrameBuffer sceneBuffer(WIDTH, HEIGHT);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		//ImGui_ImplOpenGL3_NewFrame();
-		//ImGui_ImplGlfw_NewFrame();
-		//ImGui::NewFrame();
-		//ImGuizmo::SetOrthographic(false);
-		//ImGuizmo::BeginFrame();
-		
 		uiView.InitializeNewFrame();
 
 		sceneBuffer.Bind();
@@ -192,93 +174,34 @@ int main()
 			platform.DrawLine(shaderBasic);
 		}
 
-		glm::mat4 mvpCube = proj * view * modelCube;
-		shaderBasic.SetUniformMat4f("u_MVP", mvpCube);
-		cubeModelLine.Draw(shaderBasic, GL_LINE);
-		cubeModel.Draw(shaderBasic, GL_FILL);
+		for (int i = 0; i < objectStructures.size(); i++)
+		{
+			if (!objectStructures[i].modelDefined) {
+				Model* model = new Model(objectStructures[i].path, objectStructures[i].modelColor);
+				Model* modelLine = new Model(objectStructures[i].path, objectStructures[i].modelLineColor);
+				std::vector< Model*> models;
+				models.push_back(modelLine);
+				models.push_back(model);
+				objectModels.push_back(models);
+				objectStructures[i].modelDefined = true;
+			}
+		}
 
-		glm::mat4 mvpSimple = proj * view * modelShape;
-		shaderBasic.SetUniformMat4f("u_MVP", mvpSimple);
-		simpleModelLine.Draw(shaderBasic, GL_LINE);
-		simpleModel.Draw(shaderBasic, GL_FILL);
+		for (int i = 0; i < objectModels.size(); i++)
+		{
+			glm::mat4 mvp = proj * view * objectStructures[i].objModel;
+			shaderBasic.SetUniformMat4f("u_MVP", mvp);
+			objectModels[i][0]->Draw(shaderBasic, GL_LINE);
+			objectModels[i][1]->Draw(shaderBasic, GL_FILL);
+		}
 
 		sceneBuffer.Unbind();
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		{
-			//ImGui::Begin("Pixel Engine");	
-			//ImGui::SliderFloat3("Translation", &translations[selectedObj].x, 0.0f, 200.0f);
-			//ImGui::SliderFloat3("Rotation", &rotations[selectedObj].x, 0, 360);
-			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			//ImGui::End();
-			//
-			//ImGui::SetNextWindowSize(ImVec2(WIDTH*0.7f, HEIGHT*0.7f));
-			//ImGui::Begin("Scene");
-			//{
-			//	ImGui::BeginChild("GameRender");
-			//	unsigned int frameTexture = sceneBuffer.getFrameTexture();
-			//	ImGui::Image((ImTextureID)frameTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-			//	ImGuizmo::SetDrawlist();
-			//	float windowWidth = (float)ImGui::GetWindowWidth();
-			//	float windowHeight = (float)ImGui::GetWindowHeight();
-			//	float windowPosX = ImGui::GetWindowPos().x;
-			//	float windowPosY = ImGui::GetWindowPos().y;
-			//	ImGuizmo::SetRect(windowPosX, windowPosY, windowWidth, windowHeight);
-			//	ImGuizmo::Manipulate(
-			//		glm::value_ptr(view),
-			//		glm::value_ptr(proj),
-			//		ImGuizmo::OPERATION::TRANSLATE,
-			//		ImGuizmo::MODE::LOCAL,
-			//		glm::value_ptr(modelCube)
-			//	);
-			//	ImGui::EndChild();
-			//}
-			//ImGui::End(); 
-			
-			if (selectedObj == -1)
-			{
-				selectedObj = 0;
-			}
-			uiView.DrawUiFrame(proj, view, modelCube, sceneBuffer.getFrameTexture());
-		}
-
-		{
-			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
-				float winZ;
-				glReadPixels(currentMousePosClick.x, HEIGHT - currentMousePosClick.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-				glm::vec3 objPt = glm::unProject(
-					glm::vec3(currentMousePosClick.x, HEIGHT - currentMousePosClick.y, winZ),
-					view,
-					proj,
-					glm::vec4(0, 0, WIDTH, HEIGHT)
-				);
-
-				size_t i = 0;
-				float minDist = 1000;
-				selectedObj = -1;
-
-				std::cout << glm::to_string(objPt) << std::endl;
-
-				for (i = 0; i < objectPositions.size(); i++) {
-					glm::vec3 objectDistance = glm::vec3(
-						objectPositions[i]->x,
-						objectPositions[i]->y, 
-						objectPositions[i]->z 
-					);
-
-					float dist = glm::distance(objectDistance, objPt);
-					std::cout << dist << std::endl;
-
-					if (dist < 200 && dist < minDist) {
-						selectedObj = i;
-						minDist = dist;
-					}
-				}
-
-				std::cout << selectedObj << " " << i << std::endl;
-			}
+		{	
+			uiView.DrawUiFrame(proj, view, objectStructures, sceneBuffer.getFrameTexture());
 		}
 
 		ImGui::Render();
@@ -292,6 +215,14 @@ int main()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	for (int i = 0; i < objectModels.size(); i++)
+	{
+		for (int j = 0; j < objectModels[i].size(); j++)
+		{
+			delete objectModels[i][j];
+		}
+	}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

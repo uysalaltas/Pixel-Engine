@@ -203,6 +203,7 @@
     <ClInclude Include="Libraries\include\imgui\imstb_textedit.h" />
     <ClInclude Include="Libraries\include\imgui\imstb_truetype.h" />
     <ClInclude Include="Libraries\include\stb\stb_image.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Renderer.h" />
