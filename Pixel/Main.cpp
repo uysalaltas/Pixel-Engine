@@ -109,7 +109,7 @@ int main()
 		}
 	}
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Pixel Slicer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1000, HEIGHT, "Pixel Slicer", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -141,6 +141,7 @@ int main()
 
 	ObjectStructure cube;
 	cube.path = "Models/cube.stl";
+	cube.name = "cube.stl";
 	cube.modelColor = glm::vec3(1.0f, 0.2f, 1.0f);
 	cube.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
 
@@ -210,11 +211,6 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
-	// Cleanup
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
 
 	for (int i = 0; i < objectModels.size(); i++)
 	{

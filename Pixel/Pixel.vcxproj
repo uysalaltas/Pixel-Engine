@@ -204,6 +204,7 @@
     <ClInclude Include="Libraries\include\imgui\imstb_truetype.h" />
     <ClInclude Include="Libraries\include\stb\stb_image.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Renderer.h" />
@@ -211,6 +212,9 @@
     <ClInclude Include="UiView.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="VertexBuffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Pixel.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
