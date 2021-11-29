@@ -115,19 +115,12 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::End();
 
 	ImGui::Begin("Transform");
-	glm::vec3 scale;
-	glm::quat rotation;
-	glm::vec3 translation;
-	glm::vec3 skew;
-	glm::vec4 perspective;
-	glm::decompose(model[selected].objModel, scale, rotation, translation, skew, perspective);
-	rotation = glm::conjugate(rotation);
-	ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 200.0f);
-	ImGui::SliderFloat3("Rotation", &rotation.x, 0, 360);
-	model[selected].objModel = glm::translate(glm::mat4(1.0f), translation);
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	ImGui::SliderFloat3("Translation", &model[selected].objTranslation.x, 0.0f, 200.0f);
+	ImGui::SliderFloat3("Rotation", &model[selected].objRotation.x, 0, 360);
+	model[selected].objModel = glm::translate(glm::mat4(1.0f), model[selected].objTranslation);
+	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
 
@@ -151,7 +144,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 		);
 		if (ImGuizmo::IsUsing)
 		{
-			translation = glm::vec3(model[selected].objModel[3]);
+			model[selected].objTranslation = glm::vec3(model[selected].objModel[3]);
 		}
 		//ImVec2 screen_pos = ImVec2( (ImGui::GetMousePos().x - ImGui::GetCursorScreenPos().x) , (ImGui::GetCursorScreenPos().y - ImGui::GetMousePos().y));
 		//SetOpenGLWindowMousePos(screen_pos);

@@ -32,7 +32,6 @@ glm::vec2 currentMousePosClick = glm::vec2(0.0f, 0.0f);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-//void keyboard_callback(GLFWwindow* window);
 
 glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
 glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -254,38 +253,3 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
 }
-
-//void keyboard_callback(GLFWwindow* window)
-//{
-//	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-//		camera.ProcessKeyboard(FORWARD, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-//		camera.ProcessKeyboard(BACKWARD, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-//		camera.ProcessKeyboard(LEFT, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-//		camera.ProcessKeyboard(RIGHT, deltaTime);
-//}
-
-//void ScreenPosToRay(
-//	int mouseX, int mouseY,
-//	glm::mat4 projMatrix,
-//	glm::mat4 viewMatrix
-//)
-//{
-//	float x = (2.0f * mouseX) / WIDTH - 1.0f;
-//	float y = 1.0f - (2.0f * mouseY) / HEIGHT;
-//	float z = 1.0f;
-//	glm::vec3 ray_nds = glm::vec3(x, y, z);
-//	glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
-//	glm::vec4 ray_eye = glm::inverse(projMatrix) * ray_clip;
-//	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-//
-//	glm::vec3 ray_wor = glm::vec3(
-//		(glm::inverse(viewMatrix) * ray_eye).x,
-//		(glm::inverse(viewMatrix) * ray_eye).y,
-//		(glm::inverse(viewMatrix) * ray_eye).z
-//	);
-//
-//	ray_wor = glm::normalize(ray_wor);
-//}
