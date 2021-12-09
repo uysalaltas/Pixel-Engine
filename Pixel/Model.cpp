@@ -7,6 +7,8 @@ Model::Model(std::string path, glm::vec3 modelColor)
 {
     colorData = modelColor;
 	loadModel(path);
+
+    meshesAABB.push_back(createAABB());
 }
 
 Model::~Model()
@@ -16,6 +18,8 @@ Model::~Model()
     {
         delete meshes[i];
     }
+
+    delete meshesAABB[0];
 }
 
 void Model::Draw(Shader& shader, GLenum mode)
@@ -26,6 +30,8 @@ void Model::Draw(Shader& shader, GLenum mode)
     {
         meshes[i]->DrawTriangle(shader);
     }
+
+    meshesAABB[0]->DrawLine(shader);
 }
 
 void Model::loadModel(std::string path)
@@ -74,6 +80,13 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
+        xMin = t1.minValue(vector.x, xMin);
+        xMax = t1.maxValue(vector.x, xMax);
+        yMin = t1.minValue(vector.y, yMin);
+        yMax = t1.maxValue(vector.y, yMax);
+        zMin = t1.minValue(vector.z, zMin);
+        zMax = t1.maxValue(vector.z, zMax);
+
         vertex.color.x = colorData.x;
         vertex.color.y = colorData.y;
         vertex.color.z = colorData.z;
@@ -90,8 +103,6 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         if (mesh->mTextureCoords[0])
         {
             glm::vec2 vec;
-            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
-            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.texUV = vec;
@@ -111,6 +122,16 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
         vertices.push_back(vertex);
     }
+
+    aabbVertices.push_back(xMin);
+    aabbVertices.push_back(xMax);
+    aabbVertices.push_back(yMin);
+    aabbVertices.push_back(yMax);
+    aabbVertices.push_back(zMin);
+    aabbVertices.push_back(zMax);
+
+    for (auto i : aabbVertices)
+        std::cout << i << ' ';
 
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
@@ -133,6 +154,78 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
         
     return new Renderer(vertices, indices, textures);
+}
+
+Renderer* Model::createAABB()
+{       
+    std::vector<Vertex> colliderVertices;
+    std::vector<GLuint> colliderIndices
+    {
+        // front
+        0, 1, 2,
+        2, 3, 0,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // top
+        3, 2, 6,
+        6, 7, 3
+    };
+    std::vector<Texture> colliderTextures;
+
+    Vertex colliderVertex;
+    glm::vec3 colliderVector;
+
+    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[5]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[5]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[5]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[5]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[4]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[4]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[4]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[4]);
+    colliderVertex.position = colliderVector;
+    colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    colliderVertices.push_back(colliderVertex);
+
+    return new Renderer(colliderVertices, colliderIndices, colliderTextures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)

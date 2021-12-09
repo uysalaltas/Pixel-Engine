@@ -47,7 +47,7 @@ glm::mat4 view = glm::mat4(1.0f);
 glm::mat4 modelPlatform = glm::mat4(1.0f);
 
 std::vector<ObjectStructure> objectStructures;
-std::vector<std::vector<Model*>> objectModels;
+std::vector<Model*> objectModels;
 
 int main()
 {
@@ -139,7 +139,7 @@ int main()
 	//shaderBasic.Bind();
 
 	ObjectStructure cube;
-	cube.path = "Models/cube.stl";
+	cube.path = "Models/charmender.stl";
 	cube.name = "cube.stl";
 	cube.modelColor = glm::vec3(1.0f, 0.2f, 1.0f);
 	cube.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -157,8 +157,11 @@ int main()
 
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		{
+			shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
+			shaderBasic.SetUniform3f("lightPos", 200.0f, 200.0f, 200.0f);
+
 			platform.Clear();
 			axis.Clear();
 
@@ -178,11 +181,7 @@ int main()
 		{
 			if (!objectStructures[i].modelDefined) {
 				Model* model = new Model(objectStructures[i].path, objectStructures[i].modelColor);
-				Model* modelLine = new Model(objectStructures[i].path, objectStructures[i].modelLineColor);
-				std::vector< Model*> models;
-				models.push_back(modelLine);
-				models.push_back(model);
-				objectModels.push_back(models);
+				objectModels.push_back(model);
 				objectStructures[i].modelDefined = true;
 			}
 		}
@@ -191,8 +190,7 @@ int main()
 		{
 			glm::mat4 mvp = proj * view * objectStructures[i].objModel;
 			shaderBasic.SetUniformMat4f("u_MVP", mvp);
-			objectModels[i][0]->Draw(shaderBasic, GL_LINE);
-			objectModels[i][1]->Draw(shaderBasic, GL_FILL);
+			objectModels[i]->Draw(shaderBasic, GL_FILL);
 		}
 
 		sceneBuffer.Unbind();
@@ -213,10 +211,7 @@ int main()
 
 	for (int i = 0; i < objectModels.size(); i++)
 	{
-		for (int j = 0; j < objectModels[i].size(); j++)
-		{
-			delete objectModels[i][j];
-		}
+		delete objectModels[i];
 	}
 
 	glfwDestroyWindow(window);

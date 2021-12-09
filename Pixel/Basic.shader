@@ -34,9 +34,22 @@ in vec3 Normal;
 in vec2 texCoord;
 
 uniform sampler2D texture_diffuse0;
+uniform vec3 lightColor;
+uniform vec3 lightPos;
+uniform vec3 camPos;
 
 void main()
 {
-	vec4 texColor = texture(texture_diffuse0, texCoord) + vec4(color, 1.0);
-	FragColor = texColor;
+	// ambient lighting
+	float ambientStrength = 0.80f;
+	vec3 ambient = ambientStrength * lightColor;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightPos - crntPos);
+	float diff = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuse = diff * lightColor;
+
+	vec4 texColor = vec4((ambient + diffuse), 1.0) * vec4(color, 1.0);
+	FragColor = texture(texture_diffuse0, texCoord) + texColor;
 };
