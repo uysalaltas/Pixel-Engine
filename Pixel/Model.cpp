@@ -3,17 +3,17 @@
 #include <glm/gtx/string_cast.hpp>
 
 
-Model::Model(std::string path, glm::vec3 modelColor)
+Model::Model(ObjectStructure& object)
+    : modelObj(object)
 {
-    colorData = modelColor;
-	loadModel(path);
-
+	loadModel(modelObj.path);
     meshesAABB.push_back(createAABB());
 }
 
 Model::~Model()
 {
     std::cout << "Model Deconstructor" << std::endl;
+
     for (int i = 0; i < meshes.size(); i++)
     {
         delete meshes[i];
@@ -25,13 +25,16 @@ Model::~Model()
 void Model::Draw(Shader& shader, GLenum mode)
 {
     glPolygonMode(GL_FRONT_AND_BACK, mode);
-
     for (int i = 0; i < meshes.size(); i++)
     {
         meshes[i]->DrawTriangle(shader);
     }
 
-    meshesAABB[0]->DrawLine(shader);
+    if (modelObj.AABB)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        meshesAABB[0]->DrawTriangle(shader);
+    }
 }
 
 void Model::loadModel(std::string path)
@@ -87,9 +90,10 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         zMin = t1.minValue(vector.z, zMin);
         zMax = t1.maxValue(vector.z, zMax);
 
-        vertex.color.x = colorData.x;
-        vertex.color.y = colorData.y;
-        vertex.color.z = colorData.z;
+        vertex.color.x = modelObj.modelColor.x;
+        vertex.color.y = modelObj.modelColor.y;
+        vertex.color.z = modelObj.modelColor.z;
+        //std::cout << "COLOR " << glm::to_string(vertex.color) << std::endl;
 
         // normals
         if (mesh->HasNormals())
@@ -178,50 +182,42 @@ Renderer* Model::createAABB()
         1, 0, 4,
         // top
         3, 2, 6,
-        6, 7, 3
+        6, 7, 3,
     };
     std::vector<Texture> colliderTextures;
 
     Vertex colliderVertex;
     glm::vec3 colliderVector;
-
-    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[5]);
-    colliderVertex.position = colliderVector;
+    
+    colliderVertex.position = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[5]);;
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[5]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[5]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[5]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[5]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[5]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[5]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[4]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[0], aabbVertices[2], aabbVertices[4]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[4]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[1], aabbVertices[2], aabbVertices[4]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[4]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[1], aabbVertices[3], aabbVertices[4]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 
-    colliderVector = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[4]);
-    colliderVertex.position = colliderVector;
+    colliderVertex.position = glm::vec3(aabbVertices[0], aabbVertices[3], aabbVertices[4]);
     colliderVertex.color = glm::vec3(0.0f, 1.0f, 0.0f);
     colliderVertices.push_back(colliderVertex);
 

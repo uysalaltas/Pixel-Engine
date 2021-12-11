@@ -7,11 +7,12 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "Utils.h"
+#include "Object.h"
 
 class Model
 {
 public:
-	Model(std::string path, glm::vec3 modelColor);
+	Model(ObjectStructure& object);
 	~Model();
 	void Draw(Shader& shader, GLenum mode);
 
@@ -27,7 +28,7 @@ private:
 
 	Utils t1;
 
-	glm::vec3 colorData = glm::vec3(1.0f);
+	ObjectStructure& modelObj;
 
 	void loadModel(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);

@@ -36,7 +36,6 @@ void UiView::InitializeNewFrame()
 void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure>& model, unsigned int frameTexture)
 {
 	ImGui::Begin("Objects");
-
 	if (ImGui::Button("Add Object"))
 	{
 		std::cout << "Button Clicked " << " " << std::endl;
@@ -67,8 +66,8 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 
 			ObjectStructure obj;
 			obj.path = output;
-			obj.modelColor = glm::vec3(1.0f, 1.0f, 0.2f);
-			obj.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
+			//obj.modelColor = glm::vec3(1.0f, 1.0f, 0.2f);
+			//obj.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
 
 			char* token = NULL;
 			char* name = NULL;
@@ -122,6 +121,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Checkbox("Collider", &model[selected].AABB);
 	ImGui::End();
 
 	ImGui::SetNextWindowSize(ImVec2(WIDTH * 0.7f, HEIGHT * 0.7f));

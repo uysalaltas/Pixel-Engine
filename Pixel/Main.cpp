@@ -138,11 +138,10 @@ int main()
 	Shader shaderBasic("Basic.shader");
 	//shaderBasic.Bind();
 
+
 	ObjectStructure cube;
 	cube.path = "Models/charmender.stl";
-	cube.name = "cube.stl";
-	cube.modelColor = glm::vec3(1.0f, 0.2f, 1.0f);
-	cube.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
+	cube.name = "charmender.stl";
 
 	objectStructures.push_back(cube);
 
@@ -159,8 +158,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
+			shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
 			shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
-			shaderBasic.SetUniform3f("lightPos", 200.0f, 200.0f, 200.0f);
 
 			platform.Clear();
 			axis.Clear();
@@ -180,7 +179,7 @@ int main()
 		for (int i = 0; i < objectStructures.size(); i++)
 		{
 			if (!objectStructures[i].modelDefined) {
-				Model* model = new Model(objectStructures[i].path, objectStructures[i].modelColor);
+				Model* model = new Model(objectStructures[i]);
 				objectModels.push_back(model);
 				objectStructures[i].modelDefined = true;
 			}

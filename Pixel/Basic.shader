@@ -41,7 +41,7 @@ uniform vec3 camPos;
 void main()
 {
 	// ambient lighting
-	float ambientStrength = 0.80f;
+	float ambientStrength = 0.8f;
 	vec3 ambient = ambientStrength * lightColor;
 
 	// diffuse lighting

@@ -22,26 +22,6 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, 
 	ib.Unbind();
 }	
 
-//Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<glm::uvec3>& indices)
-//	: m_vertices(vertices)
-//	, m_indices3(indices)
-//{
-//	va.Bind();
-//
-//	VertexBuffer vb(vertices);
-//	IndexBuffer ib(glm::value_ptr(indices[0]), indices.size() * sizeof(glm::uvec3));
-//	ib_size = indices.size() * 3;
-//
-//	va.AddBuffer(vb, 0, 3, sizeof(Vertex), (void*)0);
-//	va.AddBuffer(vb, 1, 3, sizeof(Vertex), (void*)(3 * sizeof(float)));
-//	va.AddBuffer(vb, 2, 3, sizeof(Vertex), (void*)(6 * sizeof(float)));
-//	va.AddBuffer(vb, 3, 2, sizeof(Vertex), (void*)(9 * sizeof(float)));
-//
-//	va.Unbind();
-//	ib.Unbind();
-//	vb.Unbind();
-//}
-
 void Renderer::DrawLine(Shader& shader)
 {
 	va.Bind();
