@@ -46,7 +46,7 @@ glm::mat4 proj = glm::mat4(1.0f);
 glm::mat4 view = glm::mat4(1.0f);
 glm::mat4 modelPlatform = glm::mat4(1.0f);
 
-std::vector<ObjectStructure> objectStructures;
+std::vector<ObjectStructure*> objectStructures;
 std::vector<Model*> objectModels;
 
 int main()
@@ -143,7 +143,7 @@ int main()
 	cube.path = "Models/charmender.stl";
 	cube.name = "charmender.stl";
 
-	objectStructures.push_back(cube);
+	objectStructures.push_back(&cube);
 
 	FrameBuffer sceneBuffer(WIDTH, HEIGHT);
 
@@ -178,16 +178,16 @@ int main()
 
 		for (int i = 0; i < objectStructures.size(); i++)
 		{
-			if (!objectStructures[i].modelDefined) {
+			if (!objectStructures[i]->modelDefined) {
 				Model* model = new Model(objectStructures[i]);
 				objectModels.push_back(model);
-				objectStructures[i].modelDefined = true;
+				objectStructures[i]->modelDefined = true;
 			}
 		}
 
 		for (int i = 0; i < objectModels.size(); i++)
 		{
-			glm::mat4 mvp = proj * view * objectStructures[i].objModel;
+			glm::mat4 mvp = proj * view * objectStructures[i]->objModel;
 			shaderBasic.SetUniformMat4f("u_MVP", mvp);
 			objectModels[i]->Draw(shaderBasic, GL_FILL);
 		}
@@ -230,12 +230,21 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 			lastMousePosRightClick.x = xpos;
 			lastMousePosRightClick.y = ypos;
 			firstMouseClick = false;
-
 		}
 
 		camera.ArcBallCamera((lastMousePosRightClick.x - xpos), (lastMousePosRightClick.y - ypos));
 		lastMousePosRightClick.x = xpos;
 		lastMousePosRightClick.y = ypos;
+	}
+	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	{
+		if (firstMouseClick)
+		{
+			lastMousePosRightClick.x = xpos;
+			lastMousePosRightClick.y = ypos;
+			firstMouseClick = false;
+		}
+		std::cout << "LAST MOUSE POS: " << glm::to_string(camera.GetLookAt()) << std::endl;
 	}
 	else 
 	{

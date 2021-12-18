@@ -3,10 +3,10 @@
 #include <glm/gtx/string_cast.hpp>
 
 
-Model::Model(ObjectStructure& object)
+Model::Model(ObjectStructure* object)
     : modelObj(object)
 {
-	loadModel(modelObj.path);
+	loadModel(modelObj->path);
     meshesAABB.push_back(createAABB());
 }
 
@@ -18,7 +18,7 @@ Model::~Model()
     {
         delete meshes[i];
     }
-
+    
     delete meshesAABB[0];
 }
 
@@ -30,7 +30,7 @@ void Model::Draw(Shader& shader, GLenum mode)
         meshes[i]->DrawTriangle(shader);
     }
 
-    if (modelObj.AABB)
+    if (modelObj->AABB == true)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         meshesAABB[0]->DrawTriangle(shader);
@@ -90,9 +90,9 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
         zMin = t1.minValue(vector.z, zMin);
         zMax = t1.maxValue(vector.z, zMax);
 
-        vertex.color.x = modelObj.modelColor.x;
-        vertex.color.y = modelObj.modelColor.y;
-        vertex.color.z = modelObj.modelColor.z;
+        vertex.color.x = modelObj->modelColor.x;
+        vertex.color.y = modelObj->modelColor.y;
+        vertex.color.z = modelObj->modelColor.z;
         //std::cout << "COLOR " << glm::to_string(vertex.color) << std::endl;
 
         // normals

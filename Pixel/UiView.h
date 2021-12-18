@@ -11,6 +11,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <vector>
 #include <windows.h>
+
 #include "Object.h"
 
 class UiView
@@ -19,7 +20,7 @@ public:
 	UiView(GLFWwindow* window, const float width, const float height);
 	~UiView();
 	void InitializeNewFrame();
-	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure>& model, unsigned int frameTexture);
+	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture);
 	void SetOpenGLWindowMousePos(ImVec2 mousePos);
 	ImVec2 GetOpenGLWindowMousePos();
 

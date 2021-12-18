@@ -3,10 +3,10 @@
 
 struct ObjectStructure
 {
-	ObjectStructure(){}
+	//ObjectStructure(){}
 
 	bool modelDefined = false;
-	bool AABB = true;
+	bool AABB = false;
 
 	std::string path;
 	std::string name;

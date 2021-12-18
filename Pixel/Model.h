@@ -12,7 +12,7 @@
 class Model
 {
 public:
-	Model(ObjectStructure& object);
+	Model(ObjectStructure* object);
 	~Model();
 	void Draw(Shader& shader, GLenum mode);
 
@@ -28,7 +28,7 @@ private:
 
 	Utils t1;
 
-	ObjectStructure& modelObj;
+	ObjectStructure* modelObj;
 
 	void loadModel(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);

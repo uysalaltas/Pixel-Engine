@@ -33,7 +33,7 @@ void UiView::InitializeNewFrame()
 	ImGuizmo::BeginFrame();
 }
 
-void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure>& model, unsigned int frameTexture)
+void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture)
 {
 	ImGui::Begin("Objects");
 	if (ImGui::Button("Add Object"))
@@ -64,8 +64,8 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 			sprintf_s(output, "%ws", szFile);
 			printf(" %s\n", output);
 
-			ObjectStructure obj;
-			obj.path = output;
+			ObjectStructure* obj = new ObjectStructure();
+			obj->path = output;
 			//obj.modelColor = glm::vec3(1.0f, 1.0f, 0.2f);
 			//obj.modelLineColor = glm::vec3(0.2f, 0.2f, 0.2f);
 
@@ -80,7 +80,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 				token = strtok_s(NULL, delimeter, &next_token);
 			}
 			printf("TOKEN %s\n", name);
-			obj.name = name;
+			obj->name = name;
 			model.push_back(obj);
 
 			//hf = CreateFile(ofn.lpstrFile,
@@ -98,7 +98,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	for (int n = 0; n < model.size(); n++)
 	{
 		char buf[256];
-		sprintf_s(buf, model[n].name.c_str());
+		sprintf_s(buf, model[n]->name.c_str());
 		if (ImGui::Selectable(buf, selection[n]))
 		{
 			std::cout << "Selected Object: " << selection[n] << std::endl;
@@ -114,14 +114,14 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::End();
 
 	ImGui::Begin("Transform");
-	ImGui::SliderFloat3("Translation", &model[selected].objTranslation.x, 0.0f, 200.0f);
-	ImGui::SliderFloat3("Rotation", &model[selected].objRotation.x, 0, 360);
-	model[selected].objModel = glm::translate(glm::mat4(1.0f), model[selected].objTranslation);
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model[selected].objModel = glm::rotate(model[selected].objModel, glm::radians(model[selected].objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	ImGui::SliderFloat3("Translation", &model[selected]->objTranslation.x, 0.0f, 200.0f);
+	ImGui::SliderFloat3("Rotation", &model[selected]->objRotation.x, 0, 360);
+	model[selected]->objModel = glm::translate(glm::mat4(1.0f), model[selected]->objTranslation);
+	model[selected]->objModel = glm::rotate(model[selected]->objModel, glm::radians(model[selected]->objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model[selected]->objModel = glm::rotate(model[selected]->objModel, glm::radians(model[selected]->objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model[selected]->objModel = glm::rotate(model[selected]->objModel, glm::radians(model[selected]->objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::Checkbox("Collider", &model[selected].AABB);
+	ImGui::Checkbox("Collider", &model[selected]->AABB);
 	ImGui::End();
 
 	ImGui::SetNextWindowSize(ImVec2(WIDTH * 0.7f, HEIGHT * 0.7f));
@@ -140,11 +140,11 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 			glm::value_ptr(proj),
 			ImGuizmo::OPERATION::TRANSLATE,
 			ImGuizmo::MODE::LOCAL,
-			glm::value_ptr(model[selected].objModel)
+			glm::value_ptr(model[selected]->objModel)
 		);
 		if (ImGuizmo::IsUsing)
 		{
-			model[selected].objTranslation = glm::vec3(model[selected].objModel[3]);
+			model[selected]->objTranslation = glm::vec3(model[selected]->objModel[3]);
 		}
 		//ImVec2 screen_pos = ImVec2( (ImGui::GetMousePos().x - ImGui::GetCursorScreenPos().x) , (ImGui::GetCursorScreenPos().y - ImGui::GetMousePos().y));
 		//SetOpenGLWindowMousePos(screen_pos);
