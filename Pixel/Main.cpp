@@ -37,7 +37,7 @@ glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
 glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
 
 Camera camera(
-	glm::vec3(0.0f, 0.0f, platfromSize * 3), 
+	glm::vec3(100.0f, 0.0f, platfromSize * 3), 
 	glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
 	upVector, WIDTH, HEIGHT
 );
@@ -244,7 +244,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 			lastMousePosRightClick.y = ypos;
 			firstMouseClick = false;
 		}
-		std::cout << "LAST MOUSE POS: " << glm::to_string(camera.GetLookAt()) << std::endl;
+		//std::cout << "LAST MOUSE POS: " << glm::to_string(camera.GetLookAt()) << std::endl;
+		camera.PanCamera(lastMousePosRightClick - currentMousePosClick);
+		lastMousePosRightClick.x = xpos;
+		lastMousePosRightClick.y = ypos;
 	}
 	else 
 	{

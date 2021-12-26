@@ -81,6 +81,36 @@ public:
         SetCameraView(finalPosition, GetLookAt(), m_upVector);
     }
 
+    void PanCamera(glm::vec2 deltaMouse)
+    {
+        glm::vec3 from_lookat_to_eye = m_eye - m_lookAt;
+        
+        float to_eye_len = glm::length(from_lookat_to_eye);
+        
+        glm::vec3 to_eye = {
+            from_lookat_to_eye[0] / to_eye_len,
+            from_lookat_to_eye[1] / to_eye_len,
+            from_lookat_to_eye[2] / to_eye_len
+        };
+
+        glm::vec3 across = {
+            -(to_eye[1] * m_upVector[2] - to_eye[2] * m_upVector[1]),
+            -(to_eye[2] * m_upVector[0] - to_eye[0] * m_upVector[2]),
+            -(to_eye[0] * m_upVector[1] - to_eye[1] * m_upVector[0])
+        };
+
+        glm::vec3 pan_delta = {
+            pan_speed * (deltaMouse.x * across[0] + deltaMouse.y * m_upVector[0]),
+            pan_speed * (deltaMouse.x * across[1] + deltaMouse.y * m_upVector[1]),
+            pan_speed * (deltaMouse.x * across[2] + deltaMouse.y * m_upVector[2]),
+        };
+
+        m_lookAt = m_lookAt + pan_delta;
+        m_eye = m_eye + pan_delta;
+
+        UpdateViewMatrix();
+    }
+
     void ProcessMouseScroll(float yoffset)
     {
         m_fov -= (float)yoffset;
@@ -123,5 +153,6 @@ private:
     float m_width;
     float m_height;
     float m_fov = 45;
+    float pan_speed = .5f;
 };
 #endif
