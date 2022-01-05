@@ -126,8 +126,6 @@ int main()
 	glfwSetCursorPos(window, (Window::Get().WIDTH / 2), (Window::Get().HEIGHT / 2));
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-
-
 #pragma endregion
 
 #pragma region IMGUI
@@ -136,7 +134,6 @@ int main()
 
 	Shader shaderBasic("Basic.shader");
 	//shaderBasic.Bind();
-
 
 	ObjectStructure cube;
 	cube.path = "Models/charmender.stl";
@@ -205,6 +202,16 @@ int main()
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
