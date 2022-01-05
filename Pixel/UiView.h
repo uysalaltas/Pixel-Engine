@@ -14,10 +14,12 @@
 
 #include "Object.h"
 
+#define IM_MAX(A, B)            (((A) >= (B)) ? (A) : (B))
+
 class UiView
 {
 public:
-	UiView(GLFWwindow* window, const float width, const float height);
+	UiView(GLFWwindow* window);
 	~UiView();
 	void InitializeNewFrame();
 	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture);
@@ -26,7 +28,12 @@ public:
 
 private:
 	ImVec2 OpenGLWindowMousePos;
-	float WIDTH;
-	float HEIGHT;
 	int selected = 0;
+	bool _fullWindow = true;
+};
+
+struct CustomConstraints
+{
+	static void Square(ImGuiSizeCallbackData* data) { data->DesiredSize.x = data->DesiredSize.y = IM_MAX(data->DesiredSize.x, data->DesiredSize.y); }
+	static void Step(ImGuiSizeCallbackData* data) { float step = (float)(int)(intptr_t)data->UserData; data->DesiredSize = ImVec2((int)(data->DesiredSize.x / step + 0.5f) * step, (int)(data->DesiredSize.y / step + 0.5f) * step); }
 };

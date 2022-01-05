@@ -1,6 +1,6 @@
 #include "UiView.h"
 
-UiView::UiView(GLFWwindow* window, const float width, const float height)
+UiView::UiView(GLFWwindow* window)
 {
 	const char* glsl_version = "#version 330";
 	ImGui::CreateContext();
@@ -10,9 +10,6 @@ UiView::UiView(GLFWwindow* window, const float width, const float height)
 	bool show_demo_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-	WIDTH = width;
-	HEIGHT = width;
 
 }
 
@@ -114,6 +111,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::End();
 
 	ImGui::Begin("Transform");
+	ImGui::Checkbox("Full Window", &_fullWindow);
 	ImGui::SliderFloat3("Translation", &model[selected]->objTranslation.x, 0.0f, 200.0f);
 	ImGui::SliderFloat3("Rotation", &model[selected]->objRotation.x, 0, 360);
 	model[selected]->objModel = glm::translate(glm::mat4(1.0f), model[selected]->objTranslation);
@@ -124,11 +122,22 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::Checkbox("Collider", &model[selected]->AABB);
 	ImGui::End();
 
-	ImGui::SetNextWindowSize(ImVec2(WIDTH * 0.7f, HEIGHT * 0.7f));
-	ImGui::Begin("Scene", 0, ImGuiWindowFlags_NoMove);
+	
+	//if (!_fullWindow)
+	//{
+	//	ImGui::SetNextWindowSize(ImVec2(WIDTH * 0.7f, HEIGHT * 0.7f));
+	//}
+	//else
+	//{
+	//	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
+	//}
+
+	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);
+	ImGui::Begin("Scene");
 	{
 		ImGui::BeginChild("GameRender");
 		ImGui::Image((ImTextureID)frameTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
+
 		ImGuizmo::SetDrawlist();
 		float windowWidth = (float)ImGui::GetWindowWidth();
 		float windowHeight = (float)ImGui::GetWindowHeight();
@@ -146,10 +155,8 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 		{
 			model[selected]->objTranslation = glm::vec3(model[selected]->objModel[3]);
 		}
-		//ImVec2 screen_pos = ImVec2( (ImGui::GetMousePos().x - ImGui::GetCursorScreenPos().x) , (ImGui::GetCursorScreenPos().y - ImGui::GetMousePos().y));
-		//SetOpenGLWindowMousePos(screen_pos);
-		ImGui::EndChild();
 	}
+	ImGui::EndChild();
 	ImGui::End();
 
 }

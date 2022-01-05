@@ -21,11 +21,10 @@
 #include "FrameBuffer.h"
 #include "UiView.h"
 #include "Object.h"
+#include "Window.h"
 
-const float WIDTH = 720.0f;
-const float HEIGHT = 720.0f;
+
 float platfromSize = 200.0f;
-
 bool firstMouseClick = true;
 glm::vec2 lastMousePosRightClick = glm::vec2(0.0f, 0.0f);
 glm::vec2 currentMousePosClick = glm::vec2(0.0f, 0.0f);
@@ -39,7 +38,7 @@ glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
 Camera camera(
 	glm::vec3(100.0f, 0.0f, platfromSize * 3), 
 	glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
-	upVector, WIDTH, HEIGHT
+	upVector, Window::Get().WIDTH, Window::Get().HEIGHT
 );
 
 glm::mat4 proj = glm::mat4(1.0f);
@@ -56,6 +55,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
@@ -107,8 +107,7 @@ int main()
 			indices.push_back(row1 + i);
 		}
 	}
-
-	GLFWwindow* window = glfwCreateWindow(1000, HEIGHT, "Pixel Slicer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(Window::Get().WIDTH, Window::Get().HEIGHT, "Pixel Slicer", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -117,14 +116,14 @@ int main()
 
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
-	glViewport(0, 0, WIDTH, HEIGHT);
+	glViewport(0, 0, Window::Get().WIDTH, Window::Get().HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 
 	std::vector<Texture> tempTexture;
 	Renderer platform(vertices, indices, tempTexture);
 	Renderer axis(verticesAxis, indicesAxis, tempTexture);
 
-	glfwSetCursorPos(window, (WIDTH / 2), (HEIGHT / 2));
+	glfwSetCursorPos(window, (Window::Get().WIDTH / 2), (Window::Get().HEIGHT / 2));
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
@@ -132,7 +131,7 @@ int main()
 #pragma endregion
 
 #pragma region IMGUI
-	UiView uiView(window, WIDTH, HEIGHT);
+	UiView uiView(window);
 #pragma endregion
 
 	Shader shaderBasic("Basic.shader");
@@ -145,7 +144,7 @@ int main()
 
 	objectStructures.push_back(&cube);
 
-	FrameBuffer sceneBuffer(WIDTH, HEIGHT);
+	FrameBuffer sceneBuffer(Window::Get().WIDTH, Window::Get().HEIGHT);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -164,7 +163,7 @@ int main()
 			platform.Clear();
 			axis.Clear();
 
-			proj = glm::perspective(glm::radians(camera.GetFOV()), (float)WIDTH / (float)HEIGHT, 0.1f, platfromSize * 20);
+			proj = glm::perspective(glm::radians(camera.GetFOV()), (float)Window::Get().WIDTH / (float)Window::Get().HEIGHT, 0.1f, platfromSize * 20);
 			view = camera.GetViewMatrix();
 			
 			glm::mat4 mvpAxisLine = proj * view * modelPlatform;
@@ -199,6 +198,9 @@ int main()
 
 		{	
 			uiView.DrawUiFrame(proj, view, objectStructures, sceneBuffer.getFrameTexture());
+			ImGui::Begin("Transform");
+			ImGui::End();
+
 		}
 
 		ImGui::Render();
