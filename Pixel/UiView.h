@@ -20,7 +20,7 @@
 class UiView
 {
 public:
-	UiView(GLFWwindow* window, Camera* camera);
+	UiView(GLFWwindow* window, Camera* camera, float* width, float* height);
 	~UiView();
 	void InitializeNewFrame();
 	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture);
@@ -32,6 +32,8 @@ private:
 	int selected = 0;
 	bool _fullWindow = true;
 	Camera* m_camera;
+	float* m_width;
+	float* m_height;
 };
 
 struct CustomConstraints

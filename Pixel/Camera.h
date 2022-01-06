@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -8,26 +7,26 @@
 #include <glm/gtx/string_cast.hpp>
 #include <vector>
 
-#include "Window.h"
+//#include "Window.h"
 
 # define M_PI           3.14159265358979323846  /* pi */
 
-enum Camera_Movement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT
-};
-
-float sensitivity = 0.1f;
-float mouseUpDown = 0;
-float mouseLeftRight = 0;
+//enum Camera_Movement {
+//    FORWARD,
+//    BACKWARD,
+//    LEFT,
+//    RIGHT
+//};
+//
+//float sensitivity = 0.1f;
+//float mouseUpDown = 0;
+//float mouseLeftRight = 0;
 
 class Camera
 {
 public:
 
-    Camera(glm::vec3 eye, glm::vec3 lookat, glm::vec3 upVector, float width, float height)
+    Camera(glm::vec3 eye, glm::vec3 lookat, glm::vec3 upVector, float* width, float* height)
         : m_eye(std::move(eye))
         , m_lookAt(std::move(lookat))
         , m_upVector(std::move(upVector))
@@ -58,7 +57,7 @@ public:
 
     void UpdateProjMatrix()
     {
-        m_projMatrix = glm::perspective(glm::radians(GetFOV()), (float)Window::Get().WIDTH / (float)Window::Get().HEIGHT, 0.1f, 200.0f * 20);
+        m_projMatrix = glm::perspective(glm::radians(m_fov), *m_width / *m_height, 0.1f, 200.0f * 20);
     }
 
     void SetCameraView(glm::vec3 eye, glm::vec3 lookat, glm::vec3 up)
@@ -73,8 +72,8 @@ public:
     {
         glm::vec4 position(GetEye().x, GetEye().y, GetEye().z, 1);
         glm::vec4 pivot(GetLookAt().x, GetLookAt().y, GetLookAt().z, 1);
-        float deltaAngleX = (2 * M_PI / m_width);
-        float deltaAngleY = (M_PI / m_height);
+        float deltaAngleX = (2 * M_PI / *m_width);
+        float deltaAngleY = (M_PI / *m_height);
         float xAngle = deltaX * deltaAngleX;
         float yAngle = deltaY * deltaAngleY;
 
@@ -163,9 +162,8 @@ private:
     glm::vec3 m_eye;                // Camera position in 3D
     glm::vec3 m_lookAt;             // Point that the camera is looking at
     glm::vec3 m_upVector;           // Orientation of the camera
-    float m_width;
-    float m_height;
+    float* m_width;
+    float* m_height;
     float m_fov = 45;
     float pan_speed = .5f;
 };
-#endif

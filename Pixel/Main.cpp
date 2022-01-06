@@ -38,7 +38,7 @@ glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
 Camera camera(
 	glm::vec3(100.0f, 0.0f, platfromSize * 3), 
 	glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
-	upVector, Window::Get().WIDTH, Window::Get().HEIGHT
+	upVector, &Window::Get().WIDTH, &Window::Get().HEIGHT
 );
 
 glm::mat4 proj = glm::mat4(1.0f);
@@ -129,7 +129,8 @@ int main()
 #pragma endregion
 
 #pragma region IMGUI
-	UiView uiView(window, &camera);
+	UiView uiView(window, &camera, &Window::Get().WIDTH, &Window::Get().HEIGHT);
+
 #pragma endregion
 
 	Shader shaderBasic("Basic.shader");
@@ -160,6 +161,7 @@ int main()
 			platform.Clear();
 			axis.Clear();
 
+			camera.UpdateProjMatrix();
 			proj = camera.GetProjMatrix();
 			view = camera.GetViewMatrix();
 			
@@ -195,8 +197,6 @@ int main()
 
 		{	
 			uiView.DrawUiFrame(proj, view, objectStructures, sceneBuffer.getFrameTexture());
-			ImGui::Begin("Transform");
-			ImGui::End();
 
 		}
 

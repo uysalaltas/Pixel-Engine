@@ -1,7 +1,9 @@
 #include "UiView.h"
 
-UiView::UiView(GLFWwindow* window, Camera* camera)
+UiView::UiView(GLFWwindow* window, Camera* camera, float* width, float* height)
 	: m_camera(camera)
+	, m_width(width)
+	, m_height(height)
 {
 	const char* glsl_version = "#version 330";
 	ImGui::CreateContext();
@@ -152,22 +154,18 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::Checkbox("Collider", &model[selected]->AABB);
 	ImGui::End();
 
-	
-	//if (!_fullWindow)
-	//{
-	//	ImGui::SetNextWindowSize(ImVec2(WIDTH * 0.7f, HEIGHT * 0.7f));
-	//}
-	//else
-	//{
-	//	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
-	//}
-	//ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);
 	ImGui::Begin("Scene");
 	{
 		ImGui::BeginChild("GameRender");
-		m_camera->SetFOV(ImGui::GetContentRegionAvail().x / ImGui::GetContentRegionAvail().y);
-		ImGui::Image((ImTextureID)frameTexture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+		//m_camera->SetFOV(ImGui::GetContentRegionAvail().x / ImGui::GetContentRegionAvail().y);
 		
+		float width = ImGui::GetContentRegionAvail().x;
+		float height = ImGui::GetContentRegionAvail().y;
+		
+		*m_width = width;
+		*m_height = height;
+		ImGui::Image((ImTextureID)frameTexture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+
 		ImGuizmo::SetDrawlist();
 		float windowWidth = (float)ImGui::GetWindowWidth();
 		float windowHeight = (float)ImGui::GetWindowHeight();
