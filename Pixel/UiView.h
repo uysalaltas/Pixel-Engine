@@ -13,13 +13,14 @@
 #include <windows.h>
 
 #include "Object.h"
+#include "Camera.h"
 
 #define IM_MAX(A, B)            (((A) >= (B)) ? (A) : (B))
 
 class UiView
 {
 public:
-	UiView(GLFWwindow* window);
+	UiView(GLFWwindow* window, Camera* camera);
 	~UiView();
 	void InitializeNewFrame();
 	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture);
@@ -30,6 +31,7 @@ private:
 	ImVec2 OpenGLWindowMousePos;
 	int selected = 0;
 	bool _fullWindow = true;
+	Camera* m_camera;
 };
 
 struct CustomConstraints

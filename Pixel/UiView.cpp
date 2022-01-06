@@ -1,6 +1,7 @@
 #include "UiView.h"
 
-UiView::UiView(GLFWwindow* window)
+UiView::UiView(GLFWwindow* window, Camera* camera)
+	: m_camera(camera)
 {
 	const char* glsl_version = "#version 330";
 	ImGui::CreateContext();
@@ -160,13 +161,13 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	//{
 	//	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
 	//}
-
-	ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);
+	//ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);
 	ImGui::Begin("Scene");
 	{
 		ImGui::BeginChild("GameRender");
-		ImGui::Image((ImTextureID)frameTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-
+		m_camera->SetFOV(ImGui::GetContentRegionAvail().x / ImGui::GetContentRegionAvail().y);
+		ImGui::Image((ImTextureID)frameTexture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+		
 		ImGuizmo::SetDrawlist();
 		float windowWidth = (float)ImGui::GetWindowWidth();
 		float windowHeight = (float)ImGui::GetWindowHeight();

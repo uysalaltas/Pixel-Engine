@@ -6,8 +6,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
-
 #include <vector>
+
+#include "Window.h"
 
 # define M_PI           3.14159265358979323846  /* pi */
 
@@ -37,6 +38,7 @@ public:
     }
 
     glm::mat4x4 GetViewMatrix() const { return m_viewMatrix; }
+    glm::mat4x4 GetProjMatrix() const { return m_projMatrix; }
     glm::vec3 GetEye() const { return m_eye; }
     glm::vec3 GetUpVector() const { return m_upVector; }
     glm::vec3 GetLookAt() const { return m_lookAt; }
@@ -44,9 +46,19 @@ public:
     glm::vec3 GetRightVector() const { return glm::transpose(m_viewMatrix)[0]; }
     float GetFOV() const { return m_fov; }
 
+    void SetFOV(float fov) 
+    { 
+        m_fov = fov; 
+    }
+
     void UpdateViewMatrix()
     {
         m_viewMatrix = glm::lookAt(m_eye, m_lookAt, m_upVector);
+    }
+
+    void UpdateProjMatrix()
+    {
+        m_projMatrix = glm::perspective(glm::radians(GetFOV()), (float)Window::Get().WIDTH / (float)Window::Get().HEIGHT, 0.1f, 200.0f * 20);
     }
 
     void SetCameraView(glm::vec3 eye, glm::vec3 lookat, glm::vec3 up)
@@ -147,6 +159,7 @@ public:
 
 private:
     glm::mat4x4 m_viewMatrix;
+    glm::mat4x4 m_projMatrix;
     glm::vec3 m_eye;                // Camera position in 3D
     glm::vec3 m_lookAt;             // Point that the camera is looking at
     glm::vec3 m_upVector;           // Orientation of the camera

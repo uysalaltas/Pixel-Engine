@@ -129,7 +129,7 @@ int main()
 #pragma endregion
 
 #pragma region IMGUI
-	UiView uiView(window);
+	UiView uiView(window, &camera);
 #pragma endregion
 
 	Shader shaderBasic("Basic.shader");
@@ -160,7 +160,7 @@ int main()
 			platform.Clear();
 			axis.Clear();
 
-			proj = glm::perspective(glm::radians(camera.GetFOV()), (float)Window::Get().WIDTH / (float)Window::Get().HEIGHT, 0.1f, platfromSize * 20);
+			proj = camera.GetProjMatrix();
 			view = camera.GetViewMatrix();
 			
 			glm::mat4 mvpAxisLine = proj * view * modelPlatform;
