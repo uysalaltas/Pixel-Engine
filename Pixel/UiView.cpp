@@ -1,7 +1,8 @@
 #include "UiView.h"
 
-UiView::UiView(GLFWwindow* window, Camera* camera, float* width, float* height)
+UiView::UiView(GLFWwindow* window, Camera* camera, FrameBuffer* frameBuffer, float* width, float* height)
 	: m_camera(camera)
+	, m_frameBuffer(frameBuffer)
 	, m_width(width)
 	, m_height(height)
 {
@@ -62,7 +63,7 @@ void UiView::InitializeNewFrame()
 	ImGuizmo::BeginFrame();
 }
 
-void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model, unsigned int frameTexture)
+void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model)
 {
 	ImGui::Begin("Objects");
 	if (ImGui::Button("Add Object"))
@@ -157,14 +158,18 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::Begin("Scene");
 	{
 		ImGui::BeginChild("GameRender");
-		//m_camera->SetFOV(ImGui::GetContentRegionAvail().x / ImGui::GetContentRegionAvail().y);
 		
 		float width = ImGui::GetContentRegionAvail().x;
 		float height = ImGui::GetContentRegionAvail().y;
 		
 		*m_width = width;
 		*m_height = height;
-		ImGui::Image((ImTextureID)frameTexture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image(
+			(ImTextureID)m_frameBuffer->getFrameTexture(), 
+			ImGui::GetContentRegionAvail(), 
+			ImVec2(0, 1), 
+			ImVec2(1, 0)
+		);
 
 		ImGuizmo::SetDrawlist();
 		float windowWidth = (float)ImGui::GetWindowWidth();
@@ -179,6 +184,7 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 			ImGuizmo::MODE::LOCAL,
 			glm::value_ptr(model[selected]->objModel)
 		);
+
 		if (ImGuizmo::IsUsing)
 		{
 			model[selected]->objTranslation = glm::vec3(model[selected]->objModel[3]);
@@ -187,6 +193,8 @@ void UiView::DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStr
 	ImGui::EndChild();
 	ImGui::End();
 
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void UiView::SetOpenGLWindowMousePos(ImVec2 mousePos)

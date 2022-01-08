@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -21,25 +19,12 @@
 #include "FrameBuffer.h"
 #include "UiView.h"
 #include "Object.h"
-#include "Window.h"
+#include "GLWindow.h"
 
 
 float platfromSize = 200.0f;
-bool firstMouseClick = true;
-glm::vec2 lastMousePosRightClick = glm::vec2(0.0f, 0.0f);
-glm::vec2 currentMousePosClick = glm::vec2(0.0f, 0.0f);
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
 glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
 glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
-
-Camera camera(
-	glm::vec3(100.0f, 0.0f, platfromSize * 3), 
-	glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
-	upVector, &Window::Get().WIDTH, &Window::Get().HEIGHT
-);
 
 glm::mat4 proj = glm::mat4(1.0f);
 glm::mat4 view = glm::mat4(1.0f);
@@ -51,12 +36,6 @@ std::vector<Model*> objectModels;
 int main()
 {
 #pragma region OPENGL_SCENE_INIT
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	int slices = platfromSize / 10;
@@ -107,31 +86,24 @@ int main()
 			indices.push_back(row1 + i);
 		}
 	}
-	GLFWwindow* window = glfwCreateWindow(Window::Get().WIDTH, Window::Get().HEIGHT, "Pixel Slicer", NULL, NULL);
-	if (window == NULL) {
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
+	
+	GLWindow gl_window;
 
-	glfwMakeContextCurrent(window);
-	gladLoadGL();
-	glViewport(0, 0, Window::Get().WIDTH, Window::Get().HEIGHT);
-	glEnable(GL_DEPTH_TEST);
+	Camera camera(
+		glm::vec3(100.0f, 0.0f, platfromSize * 3),
+		glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
+		upVector, &gl_window.WIDTH, &gl_window.HEIGHT
+
+	);
 
 	std::vector<Texture> tempTexture;
 	Renderer platform(vertices, indices, tempTexture);
 	Renderer axis(verticesAxis, indicesAxis, tempTexture);
-
-	glfwSetCursorPos(window, (Window::Get().WIDTH / 2), (Window::Get().HEIGHT / 2));
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
 #pragma endregion
 
-#pragma region IMGUI
-	UiView uiView(window, &camera, &Window::Get().WIDTH, &Window::Get().HEIGHT);
-
-#pragma endregion
+	FrameBuffer sceneBuffer(gl_window.WIDTH, gl_window.HEIGHT);
+	UiView uiView(gl_window.window, &camera, &sceneBuffer, &gl_window.WIDTH, &gl_window.HEIGHT);
+	gl_window.InitCamera(&camera, &sceneBuffer);
 
 	Shader shaderBasic("Basic.shader");
 	//shaderBasic.Bind();
@@ -142,17 +114,11 @@ int main()
 
 	objectStructures.push_back(&cube);
 
-	FrameBuffer sceneBuffer(Window::Get().WIDTH, Window::Get().HEIGHT);
-
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(gl_window.window))
 	{
 		uiView.InitializeNewFrame();
-
 		sceneBuffer.Bind();
-		glEnable(GL_DEPTH_TEST);
-
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		gl_window.Bind();
 
 		{
 			shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
@@ -191,20 +157,10 @@ int main()
 		}
 
 		sceneBuffer.Unbind();
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		{	
-			uiView.DrawUiFrame(proj, view, objectStructures, sceneBuffer.getFrameTexture());
-
-		}
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+		gl_window.Unbind();
+		uiView.DrawUiFrame(proj, view, objectStructures);
+		
 		ImGuiIO& io = ImGui::GetIO();
-
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -212,8 +168,8 @@ int main()
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
-		
-		glfwSwapBuffers(window);
+
+		glfwSwapBuffers(gl_window.window);
 		glfwPollEvents();
 	}
 
@@ -222,49 +178,5 @@ int main()
 		delete objectModels[i];
 	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
 	return 0;
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	currentMousePosClick.x = xpos;
-	currentMousePosClick.y = ypos;
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		if (firstMouseClick)
-		{
-			lastMousePosRightClick.x = xpos;
-			lastMousePosRightClick.y = ypos;
-			firstMouseClick = false;
-		}
-
-		camera.ArcBallCamera((lastMousePosRightClick.x - xpos), (lastMousePosRightClick.y - ypos));
-		lastMousePosRightClick.x = xpos;
-		lastMousePosRightClick.y = ypos;
-	}
-	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
-	{
-		if (firstMouseClick)
-		{
-			lastMousePosRightClick.x = xpos;
-			lastMousePosRightClick.y = ypos;
-			firstMouseClick = false;
-		}
-		//std::cout << "LAST MOUSE POS: " << glm::to_string(camera.GetLookAt()) << std::endl;
-		camera.PanCamera(lastMousePosRightClick - currentMousePosClick);
-		lastMousePosRightClick.x = xpos;
-		lastMousePosRightClick.y = ypos;
-	}
-	else 
-	{
-		firstMouseClick = true;
-	}
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	camera.ProcessMouseScroll(yoffset);
 }
