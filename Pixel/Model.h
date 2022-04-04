@@ -15,14 +15,14 @@ public:
 	Model(ObjectStructure* object);
 	~Model();
 	void Draw(Shader& shader, GLenum mode);
+	std::vector<Renderer*> meshes;
 
 private:
 	std::string directory;
-	std::vector<Renderer*> meshes;
 	std::vector<Renderer*> meshesAABB;
 	std::vector<Texture> textures_loaded;
 
-	std::vector<float> aabbVertices;
+	std::vector<float> aabbVertices;	
 	float xMin, yMin, zMin = 200;
 	float xMax, yMax, zMax = 0;
 

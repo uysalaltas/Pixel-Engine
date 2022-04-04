@@ -20,15 +20,14 @@
 #include "UiView.h"
 #include "Object.h"
 #include "GLWindow.h"
+#include "Scene.h"
 
 
 float platfromSize = 200.0f;
 glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
 glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
-
 glm::mat4 proj = glm::mat4(1.0f);
 glm::mat4 view = glm::mat4(1.0f);
-glm::mat4 modelPlatform = glm::mat4(1.0f);
 
 std::vector<ObjectStructure*> objectStructures;
 std::vector<Model*> objectModels;
@@ -36,59 +35,7 @@ std::vector<Model*> objectModels;
 int main()
 {
 #pragma region OPENGL_SCENE_INIT
-	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
-	int slices = platfromSize / 10;
-
-	std::vector<Vertex> verticesAxis = {
-		Vertex{glm::vec3(0.0f, 0.0f, 0.0f) , glm::vec3(1.0f, 0.0f, 0.0f)},
-		Vertex{glm::vec3(20.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
-		Vertex{glm::vec3(0.0f, 0.0f, 0.0f) , glm::vec3(0.0f, 1.0f, 0.0f)},
-		Vertex{glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-		Vertex{glm::vec3(0.0f, 0.0f, 0.0f) , glm::vec3(0.0f, 0.0f, 1.0f)},
-		Vertex{glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 1.0f)}
-	};
-
-	std::vector<GLuint> indicesAxis = {
-		0, 1, 
-		2, 3, 
-		4, 5
-	};
-
-	for (int j = 0; j <= slices; ++j) {
-		for (int i = 0; i <= slices; ++i) {
-			float x = (float)i * 10;
-			float y = (float)j * 10;
-			float z = 0;
-
-			vertices.push_back(
-				Vertex{ 
-					glm::vec3(x, y, z), 
-					glm::vec3(0.8f, 0.3f, 0.02f)
-				});
-		}
-	}
-
-	for (int j = 0; j < slices; ++j) {
-		for (int i = 0; i < slices; ++i) {
-
-			int row1 = j * (slices + 1);
-			int row2 = (j + 1) * (slices + 1);
-
-			indices.push_back(row1 + i);
-			indices.push_back(row1 + i + 1);
-			indices.push_back(row1 + i + 1);
-			indices.push_back(row2 + i + 1);
-
-			indices.push_back(row2 + i + 1);
-			indices.push_back(row2 + i);
-			indices.push_back(row2 + i);
-			indices.push_back(row1 + i);
-		}
-	}
-	
 	GLWindow gl_window;
-
 	Camera camera(
 		glm::vec3(100.0f, 0.0f, platfromSize * 3),
 		glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
@@ -96,23 +43,24 @@ int main()
 
 	);
 
-	std::vector<Texture> tempTexture;
-	Renderer platform(vertices, indices, tempTexture);
-	Renderer axis(verticesAxis, indicesAxis, tempTexture);
-#pragma endregion
-
 	FrameBuffer sceneBuffer(gl_window.WIDTH, gl_window.HEIGHT);
-	UiView uiView(gl_window.window, &camera, &sceneBuffer, &gl_window.WIDTH, &gl_window.HEIGHT);
+	UiView uiView(gl_window.window, camera, sceneBuffer, gl_window.WIDTH, gl_window.HEIGHT);
 	gl_window.InitCamera(&camera, &sceneBuffer);
 
 	Shader shaderBasic("Basic.shader");
-	//shaderBasic.Bind();
+	Scene mainScene(objectStructures, objectModels);
 
 	ObjectStructure cube;
-	cube.path = "Models/charmender.stl";
-	cube.name = "charmender.stl";
+	cube.path = "Models/cube.stl";
+	cube.name = "cube.stl";
 
 	objectStructures.push_back(&cube);
+
+	Intersection inter;
+	Plane p;
+	p.normal = glm::vec3(0, 0, 1);
+	p.distance = 0;
+#pragma endregion
 
 	while (!glfwWindowShouldClose(gl_window.window))
 	{
@@ -120,45 +68,37 @@ int main()
 		sceneBuffer.Bind();
 		gl_window.Bind();
 
+		shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
+		shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
+
+		camera.UpdateProjMatrix();
+		proj = camera.GetProjMatrix();
+		view = camera.GetViewMatrix();
+
+		mainScene.SceneUpdate(shaderBasic, camera);
+
+		std::vector<Point> outSegTips;
+		for (int i = 0; i < objectModels[0]->meshes[0]->m_triangles.size(); i++)
 		{
-			shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
-			shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
-
-			platform.Clear();
-			axis.Clear();
-
-			camera.UpdateProjMatrix();
-			proj = camera.GetProjMatrix();
-			view = camera.GetViewMatrix();
-			
-			glm::mat4 mvpAxisLine = proj * view * modelPlatform;
-			shaderBasic.SetUniformMat4f("u_MVP", mvpAxisLine);
-			axis.DrawLine(shaderBasic);
-			
-			glm::mat4 mvpPlatform = proj * view * modelPlatform;
-			shaderBasic.SetUniformMat4f("u_MVP", mvpPlatform);
-			platform.DrawLine(shaderBasic);
+			inter.TrianglePlaneIntersection(objectModels[0]->meshes[0]->m_triangles[i], p, outSegTips);
 		}
 
-		for (int i = 0; i < objectStructures.size(); i++)
-		{
-			if (!objectStructures[i]->modelDefined) {
-				Model* model = new Model(objectStructures[i]);
-				objectModels.push_back(model);
-				objectStructures[i]->modelDefined = true;
-			}
-		}
+		sort(outSegTips.begin(), outSegTips.end());
+		outSegTips.erase(unique(outSegTips.begin(), outSegTips.end()), outSegTips.end());
 
-		for (int i = 0; i < objectModels.size(); i++)
+		for (int i = 0; i < outSegTips.size(); i++)
 		{
-			glm::mat4 mvp = proj * view * objectStructures[i]->objModel;
-			shaderBasic.SetUniformMat4f("u_MVP", mvp);
-			objectModels[i]->Draw(shaderBasic, GL_FILL);
+			std::cout << "A: " << glm::to_string(outSegTips[i]) << std::endl;
 		}
 
 		sceneBuffer.Unbind();
 		gl_window.Unbind();
-		uiView.DrawUiFrame(proj, view, objectStructures);
+
+		uiView.UiObjectSection(objectStructures);
+		uiView.UiTransformSection(objectStructures);
+		uiView.UiSceneSection(objectStructures);
+		uiView.UiSliceSection();
+		uiView.DrawUiFrame();
 		
 		ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

@@ -21,21 +21,25 @@
 class UiView
 {
 public:
-	UiView(GLFWwindow* window, Camera* camera, FrameBuffer* frameBuffer,float* width, float* height);
+	UiView(GLFWwindow* window, Camera& camera, FrameBuffer& frameBuffer, float& width, float& height);
 	~UiView();
 	void InitializeNewFrame();
-	void DrawUiFrame(glm::mat4& proj, glm::mat4& view, std::vector<ObjectStructure*>& model);
+	void DrawUiFrame();
+	void UiTransformSection(std::vector<ObjectStructure*>& model);
+	void UiObjectSection(std::vector<ObjectStructure*>& model);
+	void UiSceneSection(std::vector<ObjectStructure*>& model);
+	void UiSliceSection();
+
 	void SetOpenGLWindowMousePos(ImVec2 mousePos);
 	ImVec2 GetOpenGLWindowMousePos();
 
 private:
 	ImVec2 OpenGLWindowMousePos;
-	int selected = 0;
-	bool _fullWindow = true;
-	Camera* m_camera;
-	FrameBuffer* m_frameBuffer;
-	float* m_width;
-	float* m_height;
+	int m_selected = 0;
+	Camera& m_camera;
+	FrameBuffer& m_frameBuffer;
+	float& m_width;
+	float& m_height;
 };
 
 struct CustomConstraints

@@ -134,8 +134,7 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     aabbVertices.push_back(zMin);
     aabbVertices.push_back(zMax);
 
-    for (auto i : aabbVertices)
-        std::cout << i << ' ';
+    std::cout << zMin << ' ' << zMax << std::endl;
 
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {

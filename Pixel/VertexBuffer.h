@@ -16,7 +16,7 @@ class VertexBuffer
 public:
 	VertexBuffer(std::vector<Vertex>& vertices);
 	~VertexBuffer();
-
+	void BufferDataModification(std::vector<Vertex>& vertices);
 	void Bind() const;
 	void Unbind() const;
 private:
