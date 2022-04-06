@@ -5,6 +5,10 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aColor;	
 layout(location = 2) in vec3 aNormal;
 layout(location = 3) in vec2 aTex;
+layout(location = 4) in vec2 aTangent;
+layout(location = 5) in vec2 aBitangent;
+layout(location = 6) in vec2 aBoneid;
+layout(location = 7) in vec2 aWeight;
 
 out vec3 crntPos;
 out vec3 color;
@@ -33,7 +37,7 @@ in vec3 color;
 in vec3 Normal;
 in vec2 texCoord;
 
-uniform sampler2D texture_diffuse0;
+uniform sampler2D texture_diffuse1;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
@@ -51,5 +55,5 @@ void main()
 	vec3 diffuse = diff * lightColor;
 
 	vec4 texColor = vec4((ambient + diffuse), 1.0) * vec4(color, 1.0);
-	FragColor = texture(texture_diffuse0, texCoord) + texColor;
+	FragColor = texture(texture_diffuse1, texCoord) + texColor;
 };

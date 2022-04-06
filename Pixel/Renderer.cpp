@@ -26,9 +26,14 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, 
 	ib = new IndexBuffer(m_indices);
 
 	va.AddBuffer(*vb, 0, 3, sizeof(Vertex), (void*)0);
-	va.AddBuffer(*vb, 1, 3, sizeof(Vertex), (void*)(3 * sizeof(float)));
-	va.AddBuffer(*vb, 2, 3, sizeof(Vertex), (void*)(6 * sizeof(float)));
-	va.AddBuffer(*vb, 3, 2, sizeof(Vertex), (void*)(9 * sizeof(float)));
+	va.AddBuffer(*vb, 1, 3, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	va.AddBuffer(*vb, 2, 3, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	va.AddBuffer(*vb, 3, 2, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+
+	va.AddBuffer(*vb, 4, 3, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+	va.AddBuffer(*vb, 5, 3, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
+	va.AddBuffer(*vb, 6, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
+	va.AddBuffer(*vb, 7, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
 
 	va.Unbind();
 	vb->Unbind();
@@ -53,6 +58,8 @@ void Renderer::DrawTriangle(Shader& shader)
 	// Keep track of how many of each type of textures we have
 	unsigned int numDiffuse = 1;
 	unsigned int numSpecular = 1;
+	unsigned int numNormal = 1;
+	unsigned int numheight = 1;
 
 	//std::cout << "SIZE TEXT " << m_textures.size() << std::endl;
 
@@ -71,9 +78,18 @@ void Renderer::DrawTriangle(Shader& shader)
 		{
 			num = std::to_string(numSpecular++);
 		}
+		else if (type == "texture_normal")
+		{
+			num = std::to_string(numNormal++);
+		}
+		else if (type == "texture_height")
+		{
+			num = std::to_string(numheight++);
+		}
 
+		std::cout << type + num << std::endl;
+		m_textures[i].texUnit(shader, (type + num).c_str(), i);
 		m_textures[i].Bind();
-		m_textures[i].texUnit(shader, "texture_diffuse0", i);
 	}
 
 	vb->BufferDataModification(m_vertices);

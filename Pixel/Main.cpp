@@ -23,7 +23,7 @@
 #include "Scene.h"
 
 
-float platfromSize = 200.0f;
+float platfromSize = 20.0f;
 glm::vec2 centerPlatformPoint = glm::vec2(platfromSize/2, platfromSize/2);
 glm::vec3 upVector = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::mat4 proj = glm::mat4(1.0f);
@@ -38,7 +38,7 @@ int main()
 	GLWindow gl_window;
 	Camera camera(
 		glm::vec3(100.0f, 0.0f, platfromSize * 3),
-		glm::vec3(centerPlatformPoint.x, centerPlatformPoint.y, 0.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
 		upVector, &gl_window.WIDTH, &gl_window.HEIGHT
 
 	);
@@ -51,15 +51,15 @@ int main()
 	Scene mainScene(objectStructures, objectModels);
 
 	ObjectStructure cube;
-	cube.path = "Models/cube.stl";
-	cube.name = "cube.stl";
+	cube.path = "Models/eyeball.obj";
+	cube.name = "cube";
 
 	objectStructures.push_back(&cube);
 
 	Intersection inter;
 	Plane p;
 	p.normal = glm::vec3(0, 0, 1);
-	p.distance = 0;
+	p.distance = 10;
 #pragma endregion
 
 	while (!glfwWindowShouldClose(gl_window.window))
@@ -77,19 +77,24 @@ int main()
 
 		mainScene.SceneUpdate(shaderBasic, camera);
 
-		std::vector<Point> outSegTips;
-		for (int i = 0; i < objectModels[0]->meshes[0]->m_triangles.size(); i++)
-		{
-			inter.TrianglePlaneIntersection(objectModels[0]->meshes[0]->m_triangles[i], p, outSegTips);
-		}
+		//std::vector<Point> outSegTips;
+		//for (int i = 0; i < objectModels[0]->meshes[0]->m_triangles.size(); i++)
+		//{
+		//	inter.TrianglePlaneIntersection(objectModels[0]->meshes[0]->m_triangles[i], p, outSegTips);
+		//}
 
-		sort(outSegTips.begin(), outSegTips.end());
-		outSegTips.erase(unique(outSegTips.begin(), outSegTips.end()), outSegTips.end());
+		//sort(outSegTips.begin(), outSegTips.end(),
+		//	[](const glm::vec3& lhs, const glm::vec3& rhs) {
+		//		// Sort in ascending order by key x, y priority
+		//		return std::tie(lhs.x, lhs.y) < std::tie(rhs.x, rhs.y);
+		//	}
+		//);
+		//outSegTips.erase(unique(outSegTips.begin(), outSegTips.end()), outSegTips.end());
 
-		for (int i = 0; i < outSegTips.size(); i++)
-		{
-			std::cout << "A: " << glm::to_string(outSegTips[i]) << std::endl;
-		}
+		//for (int i = 0; i < outSegTips.size(); i++)
+		//{
+		//	std::cout << "A: " << glm::to_string(outSegTips[i]) << std::endl;
+		//}
 
 		sceneBuffer.Unbind();
 		gl_window.Unbind();

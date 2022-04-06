@@ -44,13 +44,22 @@ struct Intersection
 	{
 		Point IntersectionPoint;
 		if (GetSegmentPlaneIntersection(tri.a, tri.b, IntersectionPoint, p))
-			outSegTips.push_back(IntersectionPoint);
+			if (!isnan(IntersectionPoint.x))
+			{
+				outSegTips.push_back(IntersectionPoint);
+			}
 
 		if (GetSegmentPlaneIntersection(tri.b, tri.c, IntersectionPoint, p))
-			outSegTips.push_back(IntersectionPoint);
+			if (!isnan(IntersectionPoint.x))
+			{
+				outSegTips.push_back(IntersectionPoint);
+			}
 
 		if (GetSegmentPlaneIntersection(tri.c, tri.a, IntersectionPoint, p))
-			outSegTips.push_back(IntersectionPoint);
+			if (!isnan(IntersectionPoint.x))
+			{
+				outSegTips.push_back(IntersectionPoint);
+			}
 
 	}
 

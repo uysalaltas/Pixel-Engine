@@ -114,12 +114,12 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
             //vector.x = mesh->mTangents[i].x;
             //vector.y = mesh->mTangents[i].y;
             //vector.z = mesh->mTangents[i].z;
-            //vertex.Tangent = vector;
+            //vertex.tangent = vector;
             //// bitangent
             //vector.x = mesh->mBitangents[i].x;
             //vector.y = mesh->mBitangents[i].y;
             //vector.z = mesh->mBitangents[i].z;
-            //vertex.Bitangent = vector;
+            //vertex.bitangent = vector;
         }
         else
             vertex.texUV = glm::vec2(0.0f, 0.0f);
