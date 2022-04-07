@@ -60,6 +60,7 @@ int main()
 	Plane p;
 	p.normal = glm::vec3(0, 0, 1);
 	p.distance = 10;
+
 #pragma endregion
 
 	while (!glfwWindowShouldClose(gl_window.window))

@@ -38,6 +38,9 @@ in vec3 Normal;
 in vec2 texCoord;
 
 uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_normal1;
+uniform sampler2D texture_specular1;
+
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
@@ -55,5 +58,7 @@ void main()
 	vec3 diffuse = diff * lightColor;
 
 	vec4 texColor = vec4((ambient + diffuse), 1.0) * vec4(color, 1.0);
-	FragColor = texture(texture_diffuse1, texCoord) + texColor;
+	FragColor = 
+		texture(texture_diffuse1, texCoord) + 
+		texColor;
 };

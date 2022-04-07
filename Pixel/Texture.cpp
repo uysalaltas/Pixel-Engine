@@ -1,7 +1,7 @@
 #include"Texture.h"
 #include <iostream>
 
-Texture::Texture(const char* filepath, const char* texType, GLuint unitType)
+Texture::Texture(const char* filepath, std::string texType, GLuint unitType)
 {
 	//std::cout << "Texture Constructor" << std::endl;
 	type = texType;

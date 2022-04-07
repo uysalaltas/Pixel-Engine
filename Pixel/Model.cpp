@@ -40,7 +40,12 @@ void Model::Draw(Shader& shader, GLenum mode)
 void Model::loadModel(std::string path)
 {
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    unsigned int importOptions = aiProcess_Triangulate
+        | aiProcess_OptimizeMeshes
+        | aiProcess_JoinIdenticalVertices
+        | aiProcess_Triangulate
+        | aiProcess_CalcTangentSpace;
+    const aiScene* scene = import.ReadFile(path, importOptions);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -245,7 +250,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         }
         if (!skip)
         {
-            Texture texture(str.C_Str(), typeName.c_str(), i);
+            Texture texture(str.C_Str(), typeName, i);
             
             textures.push_back(texture);
             textures_loaded.push_back(texture);

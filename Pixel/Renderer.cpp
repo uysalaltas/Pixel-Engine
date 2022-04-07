@@ -80,14 +80,14 @@ void Renderer::DrawTriangle(Shader& shader)
 		}
 		else if (type == "texture_normal")
 		{
-			num = std::to_string(numNormal++);
+			num = std::to_string(numNormal++)	;
 		}
 		else if (type == "texture_height")
 		{
 			num = std::to_string(numheight++);
 		}
 
-		std::cout << type + num << std::endl;
+		//std::cout << "Type: " << type << std::endl;
 		m_textures[i].texUnit(shader, (type + num).c_str(), i);
 		m_textures[i].Bind();
 	}
