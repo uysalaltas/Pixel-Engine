@@ -50,11 +50,10 @@ int main()
 	Shader shaderBasic("Basic.shader");
 	Scene mainScene(objectStructures, objectModels);
 
-	ObjectStructure cube;
-	cube.path = "Models/eyeball.obj";
-	cube.name = "cube";
-
-	objectStructures.push_back(&cube);
+	//ObjectStructure* eye = new ObjectStructure();
+	//eye->path = "Models/eyeball.obj";
+	//eye->name = "eye";
+	//objectStructures.push_back(eye);
 
 	Intersection inter;
 	Plane p;
@@ -63,14 +62,16 @@ int main()
 
 #pragma endregion
 
+	bool tryNow = false;
+
 	while (!glfwWindowShouldClose(gl_window.window))
 	{
 		uiView.InitializeNewFrame();
 		sceneBuffer.Bind();
 		gl_window.Bind();
 
-		shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
-		shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
+		//shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
+		//shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
 
 		camera.UpdateProjMatrix();
 		proj = camera.GetProjMatrix();
@@ -83,7 +84,6 @@ int main()
 		//{
 		//	inter.TrianglePlaneIntersection(objectModels[0]->meshes[0]->m_triangles[i], p, outSegTips);
 		//}
-
 		//sort(outSegTips.begin(), outSegTips.end(),
 		//	[](const glm::vec3& lhs, const glm::vec3& rhs) {
 		//		// Sort in ascending order by key x, y priority
@@ -91,7 +91,6 @@ int main()
 		//	}
 		//);
 		//outSegTips.erase(unique(outSegTips.begin(), outSegTips.end()), outSegTips.end());
-
 		//for (int i = 0; i < outSegTips.size(); i++)
 		//{
 		//	std::cout << "A: " << glm::to_string(outSegTips[i]) << std::endl;

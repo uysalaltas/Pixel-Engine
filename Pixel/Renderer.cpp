@@ -30,10 +30,10 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, 
 	va.AddBuffer(*vb, 2, 3, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	va.AddBuffer(*vb, 3, 2, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 
-	va.AddBuffer(*vb, 4, 3, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
-	va.AddBuffer(*vb, 5, 3, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
-	va.AddBuffer(*vb, 6, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
-	va.AddBuffer(*vb, 7, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
+	//va.AddBuffer(*vb, 4, 3, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+	//va.AddBuffer(*vb, 5, 3, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
+	//va.AddBuffer(*vb, 6, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
+	//va.AddBuffer(*vb, 7, 4, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
 
 	va.Unbind();
 	vb->Unbind();
@@ -45,14 +45,14 @@ Renderer::Renderer(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, 
 void Renderer::DrawLine(Shader& shader)
 {
 	va.Bind();
-	shader.Bind();
+	//shader.Bind();
 
 	glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::DrawTriangle(Shader& shader)
 {
-	shader.Bind();
+	//shader.Bind();
 	va.Bind();
 
 	// Keep track of how many of each type of textures we have
@@ -88,8 +88,8 @@ void Renderer::DrawTriangle(Shader& shader)
 		}
 
 		//std::cout << "Type: " << type << std::endl;
-		m_textures[i].texUnit(shader, (type + num).c_str(), i);
 		m_textures[i].Bind();
+		m_textures[i].texUnit(shader, (type + num).c_str(), i);
 	}
 
 	vb->BufferDataModification(m_vertices);

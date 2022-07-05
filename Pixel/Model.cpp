@@ -78,6 +78,9 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<GLuint> indices;
     std::vector<Texture> textures;
 
+    std::cout << "\nmName: " << mesh->mName.C_Str() << std::endl;
+
+
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;
@@ -139,7 +142,7 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     aabbVertices.push_back(zMin);
     aabbVertices.push_back(zMax);
 
-    std::cout << zMin << ' ' << zMax << std::endl;
+    //std::cout << zMin << ' ' << zMax << std::endl;
 
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
@@ -152,11 +155,13 @@ Renderer* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
+    //std::cout <<"Reflection Count: " << material->GetTextureCount(aiTextureType_REFLECTION) << std::endl;
+
     std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
@@ -231,6 +236,7 @@ Renderer* Model::createAABB()
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
     std::vector<Texture> textures;
+    //std::cout << "Texture Count: " << mat->GetTextureCount(type) << std::endl;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {

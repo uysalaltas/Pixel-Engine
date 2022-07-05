@@ -72,16 +72,21 @@ void UiView::DrawUiFrame()
 void UiView::UiTransformSection(std::vector<ObjectStructure*>& model)
 {
 	ImGui::Begin("Transform");
-	ImGui::SliderFloat3("Translation", &model[m_selected]->objTranslation.x, 0.0f, 200.0f);
-	ImGui::SliderFloat3("Rotation", &model[m_selected]->objRotation.x, 0, 360);
 
-	model[m_selected]->objModel = glm::translate(glm::mat4(1.0f), model[m_selected]->objTranslation);
-	model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	if (model.size() > 0)
+	{
+		ImGui::SliderFloat3("Translation", &model[m_selected]->objTranslation.x, 0.0f, 200.0f);
+		ImGui::SliderFloat3("Rotation", &model[m_selected]->objRotation.x, 0, 360);
+
+		model[m_selected]->objModel = glm::translate(glm::mat4(1.0f), model[m_selected]->objTranslation);
+		model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model[m_selected]->objModel = glm::rotate(model[m_selected]->objModel, glm::radians(model[m_selected]->objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		
+		ImGui::Checkbox("Collider", &model[m_selected]->AABB);
+	}
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::Checkbox("Collider", &model[m_selected]->AABB);
 	ImGui::End();
 }
 
@@ -170,24 +175,26 @@ void UiView::UiSceneSection(std::vector<ObjectStructure*>& model)
 			ImVec2(0, 1),
 			ImVec2(1, 0)
 		);
-
-		ImGuizmo::SetDrawlist();
-		float windowWidth = (float)ImGui::GetWindowWidth();
-		float windowHeight = (float)ImGui::GetWindowHeight();
-		float windowPosX = ImGui::GetWindowPos().x;
-		float windowPosY = ImGui::GetWindowPos().y;
-		ImGuizmo::SetRect(windowPosX, windowPosY, windowWidth, windowHeight);
-		ImGuizmo::Manipulate(
-			glm::value_ptr(m_camera.GetViewMatrix()),
-			glm::value_ptr(m_camera.GetProjMatrix()),
-			ImGuizmo::OPERATION::TRANSLATE,
-			ImGuizmo::MODE::LOCAL,
-			glm::value_ptr(model[m_selected]->objModel)
-		);
-
-		if (ImGuizmo::IsUsing)
+		if (model.size() > 0)
 		{
-			model[m_selected]->objTranslation = glm::vec3(model[m_selected]->objModel[3]);
+			ImGuizmo::SetDrawlist();
+			float windowWidth = (float)ImGui::GetWindowWidth();
+			float windowHeight = (float)ImGui::GetWindowHeight();
+			float windowPosX = ImGui::GetWindowPos().x;
+			float windowPosY = ImGui::GetWindowPos().y;
+			ImGuizmo::SetRect(windowPosX, windowPosY, windowWidth, windowHeight);
+			ImGuizmo::Manipulate(
+				glm::value_ptr(m_camera.GetViewMatrix()),
+				glm::value_ptr(m_camera.GetProjMatrix()),
+				ImGuizmo::OPERATION::TRANSLATE,
+				ImGuizmo::MODE::LOCAL,
+				glm::value_ptr(model[m_selected]->objModel)
+			);
+
+			if (ImGuizmo::IsUsing)
+			{
+				model[m_selected]->objTranslation = glm::vec3(model[m_selected]->objModel[3]);
+			}
 		}
 	}
 	ImGui::EndChild();
@@ -200,6 +207,12 @@ void UiView::UiSliceSection()
 	if (ImGui::Button("Slice"))
 	{
 		std::cout << "Button Clicked " << " " << std::endl;
+
+		//ObjectStructure* cube = new ObjectStructure();
+		//cube->path = "Models/RubixCube.obj";
+		//cube->name = "cube";
+		//model.push_back(cube);
+
 	}
 	ImGui::End();
 }

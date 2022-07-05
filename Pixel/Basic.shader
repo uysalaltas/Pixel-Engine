@@ -5,10 +5,6 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aColor;	
 layout(location = 2) in vec3 aNormal;
 layout(location = 3) in vec2 aTex;
-layout(location = 4) in vec2 aTangent;
-layout(location = 5) in vec2 aBitangent;
-layout(location = 6) in vec2 aBoneid;
-layout(location = 7) in vec2 aWeight;
 
 out vec3 crntPos;
 out vec3 color;
@@ -39,7 +35,7 @@ in vec2 texCoord;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_normal1;
-uniform sampler2D texture_specular1;
+//uniform sampler2D texture_specular1;
 
 uniform vec3 lightColor;
 uniform vec3 lightPos;
@@ -47,18 +43,21 @@ uniform vec3 camPos;
 
 void main()
 {
-	// ambient lighting
-	float ambientStrength = 0.8f;
-	vec3 ambient = ambientStrength * lightColor;
+	// ambient
+	vec3 ambient = vec3(0.2f, 0.2f, 0.2f) * texture(texture_diffuse1, texCoord).rgb;
 
-	// diffuse lighting
-	vec3 normal = normalize(Normal);
-	vec3 lightDirection = normalize(lightPos - crntPos);
-	float diff = max(dot(normal, lightDirection), 0.0f);
-	vec3 diffuse = diff * lightColor;
+	// diffuse 
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(vec3((10.2f, 10.0f, 20.0f)) - crntPos);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = vec3(0.5f, 0.5f, 0.5f) * diff * texture(texture_diffuse1, texCoord).rgb;
 
-	vec4 texColor = vec4((ambient + diffuse), 1.0) * vec4(color, 1.0);
-	FragColor = 
-		texture(texture_diffuse1, texCoord) + 
-		texColor;
+	// specular
+	//vec3 viewDir = normalize(camPos - crntPos);
+	//vec3 reflectDir = reflect(-lightDir, norm);
+	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0f);
+	//vec3 specular = vec3(1.0f, 1.0f, 1.0f) * spec * texture(texture_specular1, texCoord).rgb;
+
+	vec3 result = ambient + diffuse;
+	FragColor = vec4(result, 1.0);
 };
