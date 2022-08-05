@@ -202,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.shader" />
+    <None Include="BasicTexture.shader" />
     <None Include="Models\cube.glb" />
     <None Include="Models\cube.stl" />
     <None Include="Platform.shader" />

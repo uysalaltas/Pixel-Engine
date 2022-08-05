@@ -4,21 +4,22 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aColor;	
 layout(location = 2) in vec3 aNormal;
-layout(location = 3) in vec2 aTex;
 
-out vec3 crntPos;
-out vec3 color;
-out vec3 Normal;
-out vec2 texCoord;
+out VS_OUT
+{
+	vec3 CrntPos;
+	vec3 Color;
+	vec3 Normal;
+} vs_out;
 
 uniform mat4 u_MVP;
+uniform mat4 model;
 
 void main()
 {
-	crntPos = aPos;
-	color = aColor;
-	Normal = aNormal;
-	texCoord = aTex;
+	vs_out.CrntPos = vec3(model * vec4(aPos, 1.0));
+	vs_out.Color = aColor;
+	vs_out.Normal = aNormal;
 
 	gl_Position = u_MVP * vec4(aPos, 1.0);
 };
@@ -28,14 +29,12 @@ void main()
 
 out vec4 FragColor;
 
-in vec3 crntPos;
-in vec3 color;
-in vec3 Normal;
-in vec2 texCoord;
-
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_normal1;
-//uniform sampler2D texture_specular1;
+in VS_OUT
+{
+	vec3 CrntPos;
+	vec3 Color;
+	vec3 Normal;
+} fs_in;
 
 uniform vec3 lightColor;
 uniform vec3 lightPos;
@@ -44,20 +43,15 @@ uniform vec3 camPos;
 void main()
 {
 	// ambient
-	vec3 ambient = vec3(0.2f, 0.2f, 0.2f) * texture(texture_diffuse1, texCoord).rgb;
+	float ambientStrength = 0.8f;
+	vec3 ambient = ambientStrength * lightColor;
 
 	// diffuse 
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(vec3((10.2f, 10.0f, 20.0f)) - crntPos);
+	vec3 norm = normalize(fs_in.Normal);
+	vec3 lightDir = normalize(lightPos - fs_in.CrntPos);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = vec3(0.5f, 0.5f, 0.5f) * diff * texture(texture_diffuse1, texCoord).rgb;
+	vec3 diffuse = diff * lightColor;
 
-	// specular
-	//vec3 viewDir = normalize(camPos - crntPos);
-	//vec3 reflectDir = reflect(-lightDir, norm);
-	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0f);
-	//vec3 specular = vec3(1.0f, 1.0f, 1.0f) * spec * texture(texture_specular1, texCoord).rgb;
-
-	vec3 result = ambient + diffuse;
+	vec3 result = (ambient + diffuse) * fs_in.Color;
 	FragColor = vec4(result, 1.0);
 };

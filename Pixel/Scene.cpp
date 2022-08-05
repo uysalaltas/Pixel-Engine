@@ -63,6 +63,13 @@ void Scene::SceneUpdate(Shader& shader, Camera& camera)
 		shader.Bind();
 		glm::mat4 mvp = camera.GetProjMatrix() * camera.GetViewMatrix() * m_objectStructures[i]->objModel;
 		shader.SetUniformMat4f("u_MVP", mvp);
+		shader.SetUniformMat4f("model", m_objectStructures[i]->objModel);
+
+		glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+		shader.SetUniformVec3f("lightPos", lightPos);
+		shader.SetUniformVec3f("lightColor", glm::vec3(0.8f, 0.8f, 0.8f));
+		shader.SetUniformVec3f("camPos", camera.GetEye());
+
 		m_objectModels[i]->Draw(shader, GL_FILL);
 	}
 }

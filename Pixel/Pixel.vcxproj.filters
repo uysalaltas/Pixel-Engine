@@ -107,6 +107,9 @@
     <None Include="Platform.shader">
       <Filter>Resource Files\Shader</Filter>
     </None>
+    <None Include="BasicTexture.shader">
+      <Filter>Resource Files\Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

@@ -70,9 +70,6 @@ int main()
 		sceneBuffer.Bind();
 		gl_window.Bind();
 
-		//shaderBasic.SetUniform3f("lightPos", 0.0f, 0.0f, 0.0f);
-		//shaderBasic.SetUniform3f("lightColor", 0.8f, 0.8f, 0.8f);
-
 		camera.UpdateProjMatrix();
 		proj = camera.GetProjMatrix();
 		view = camera.GetViewMatrix();
