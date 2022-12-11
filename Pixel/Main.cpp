@@ -37,7 +37,7 @@ int main()
 #pragma region OPENGL_SCENE_INIT
 	GLWindow gl_window;
 	Camera camera(
-		glm::vec3(100.0f, 0.0f, platfromSize * 3),
+		glm::vec3(300.0f, 0.0f, platfromSize * 3),
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		upVector, &gl_window.WIDTH, &gl_window.HEIGHT
 
@@ -50,16 +50,18 @@ int main()
 	Shader shaderBasic("Basic.shader");
 	Scene mainScene(objectStructures, objectModels);
 
-	//ObjectStructure* eye = new ObjectStructure();
-	//eye->path = "Models/eyeball.obj";
-	//eye->name = "eye";
-	//objectStructures.push_back(eye);
+	ObjectStructure* eye = new ObjectStructure();
+	eye->path = "Models/cube.stl";
+	eye->name = "cube";
+	objectStructures.push_back(eye);
 
 	Intersection inter;
 	Plane p;
 	p.normal = glm::vec3(0, 0, 1);
-	p.distance = 10;
+	p.distance = 0.0f;
+	float layerHeight = 0.2f;
 
+	std::vector<std::vector<TriangleIntersect>> results;
 #pragma endregion
 
 	bool tryNow = false;
@@ -76,30 +78,93 @@ int main()
 
 		mainScene.SceneUpdate(shaderBasic, camera);
 
-		//std::vector<Point> outSegTips;
-		//for (int i = 0; i < objectModels[0]->meshes[0]->m_triangles.size(); i++)
-		//{
-		//	inter.TrianglePlaneIntersection(objectModels[0]->meshes[0]->m_triangles[i], p, outSegTips);
-		//}
-		//sort(outSegTips.begin(), outSegTips.end(),
-		//	[](const glm::vec3& lhs, const glm::vec3& rhs) {
-		//		// Sort in ascending order by key x, y priority
-		//		return std::tie(lhs.x, lhs.y) < std::tie(rhs.x, rhs.y);
-		//	}
-		//);
-		//outSegTips.erase(unique(outSegTips.begin(), outSegTips.end()), outSegTips.end());
-		//for (int i = 0; i < outSegTips.size(); i++)
-		//{
-		//	std::cout << "A: " << glm::to_string(outSegTips[i]) << std::endl;
-		//}
-
 		sceneBuffer.Unbind();
 		gl_window.Unbind();
 
 		uiView.UiObjectSection(objectStructures);
 		uiView.UiTransformSection(objectStructures);
 		uiView.UiSceneSection(objectStructures);
-		uiView.UiSliceSection();
+		//uiView.UiSliceSection(objectModels);
+
+		ImGui::Begin("Slice");
+		if (ImGui::Button("Slice"))
+		{
+			std::cout << "Button Clicked " << " " << std::endl;
+		
+			for (int dist = 0; dist < 100; dist++)
+			{
+				std::vector<TriangleIntersect> result;
+				for (int i = 0; i < objectModels[0]->meshes.size(); i++)
+				{
+					for (int j = 0; j < objectModels[0]->meshes[i]->m_triangles.size(); j++)
+					{
+						//std::cout << "Next Mesh" << std::endl;
+						inter.TrianglePlaneIntersection(objectModels[0]->meshes[i]->m_triangles[j], p, result);
+					}
+				}
+				p.distance = p.distance + layerHeight;
+				results.push_back(result);
+			}
+
+			for (int ind = 0; ind < results.size(); ind++)
+			{
+				std::cout << ";layer " << ind << std::endl;
+
+				std::vector<Point> resultReorder;
+
+				Point tempPoint = results[ind][0].points[1];
+				Point firstTempPoint = results[ind][0].points[1];
+				resultReorder.push_back(results[ind][0].points[0]);
+				bool loopBreak = false;
+
+				int loopIndice = 1;
+				int offset = 100;
+
+				for (int i = 0; i < results[ind].size(); i++)
+				{
+					std::cout << "DBG1: " << glm::to_string(results[ind][i].points[0]) << std::endl;
+					std::cout << "DBG2: " << glm::to_string(results[ind][i].points[1]) << std::endl;
+				}
+
+				while (loopIndice != results[ind].size())
+				{
+					//std::cout << loopIndice << std::endl;
+					for (int i = 0; i < results[ind].size(); i++)
+					{
+						if (results[ind][i].points[0] != results[ind][i].points[1])
+						{
+							if (tempPoint == results[ind][i].points[0])
+							{
+								resultReorder.push_back(tempPoint);
+								loopIndice++;
+
+								tempPoint = results[ind][i].points[1];
+								break;
+							}
+						}
+					}
+
+					if (firstTempPoint == tempPoint)
+					{
+						loopBreak = true;
+						break;
+					}
+				}
+
+				if (!loopBreak)
+				{
+					resultReorder.push_back(results[ind][0].points[0]);
+				}
+
+				for (int i = 0; i < resultReorder.size(); i++)
+				{
+					std::cout << "G1 " << "X" << resultReorder[i].x + offset << " Y" << resultReorder[i].y + offset << std::endl;
+				}
+				std::cout << "G0 F300 " << "X" << resultReorder[0].x + offset << " Y" << resultReorder[0].y + offset << " Z" << resultReorder[0].z << std::endl;
+			}
+		}
+		ImGui::End();
+
 		uiView.DrawUiFrame();
 		
 		ImGuiIO& io = ImGui::GetIO();

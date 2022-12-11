@@ -201,21 +201,10 @@ void UiView::UiSceneSection(std::vector<ObjectStructure*>& model)
 	ImGui::End();
 }
 
-void UiView::UiSliceSection()
-{
-	ImGui::Begin("Slice");
-	if (ImGui::Button("Slice"))
-	{
-		std::cout << "Button Clicked " << " " << std::endl;
+//void UiView::UiSliceSection(std::vector<Model*>& objectModels)
+//{
 
-		//ObjectStructure* cube = new ObjectStructure();
-		//cube->path = "Models/RubixCube.obj";
-		//cube->name = "cube";
-		//model.push_back(cube);
-
-	}
-	ImGui::End();
-}
+//}
 
 void UiView::SetOpenGLWindowMousePos(ImVec2 mousePos)
 {

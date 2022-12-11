@@ -19,7 +19,7 @@ void main()
 {
 	vs_out.CrntPos = vec3(model * vec4(aPos, 1.0));
 	vs_out.Color = aColor;
-	vs_out.Normal = aNormal;
+	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
 
 	gl_Position = u_MVP * vec4(aPos, 1.0);
 };
@@ -52,6 +52,13 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
 
-	vec3 result = (ambient + diffuse) * fs_in.Color;
+	// specular
+	float specularStrength = 0.5;
+	vec3 viewDir = normalize(camPos - fs_in.CrntPos);
+	vec3 reflectDir = reflect(-lightDir, fs_in.Normal);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+	vec3 specular = specularStrength * spec * fs_in.Color;
+
+	vec3 result = (ambient + diffuse + specular) * fs_in.Color;
 	FragColor = vec4(result, 1.0);
 };

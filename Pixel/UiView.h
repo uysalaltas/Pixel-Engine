@@ -28,7 +28,7 @@ public:
 	void UiTransformSection(std::vector<ObjectStructure*>& model);
 	void UiObjectSection(std::vector<ObjectStructure*>& model);
 	void UiSceneSection(std::vector<ObjectStructure*>& model);
-	void UiSliceSection();
+	//void UiSliceSection(std::vector<Model*>& objectModels);
 
 	void SetOpenGLWindowMousePos(ImVec2 mousePos);
 	ImVec2 GetOpenGLWindowMousePos();

@@ -38,16 +38,16 @@ Scene::Scene(std::vector<ObjectStructure*>& objectStructures, std::vector<Model*
 		}
 	}
 
-	//axis = new Renderer(verticesAxis, indicesAxis, emptyTexture);
+	axis = new Renderer(verticesAxis, indicesAxis, emptyTexture);
 }
 
 void Scene::SceneUpdate(Shader& shader, Camera& camera)
 {
-	//axis->Clear();
+	axis->Clear();
 
-	//glm::mat4 mvpAxisLine = camera.GetProjMatrix() * camera.GetViewMatrix() * modelPlatform;
-	//shader.SetUniformMat4f("u_MVP", mvpAxisLine);
-	//axis->DrawLine(shader);
+	glm::mat4 mvpAxisLine = camera.GetProjMatrix() * camera.GetViewMatrix() * modelPlatform;
+	shader.SetUniformMat4f("u_MVP", mvpAxisLine);
+	axis->DrawLine(shader);
 
 	for (int i = 0; i < m_objectStructures.size(); i++)
 	{
@@ -65,11 +65,11 @@ void Scene::SceneUpdate(Shader& shader, Camera& camera)
 		shader.SetUniformMat4f("u_MVP", mvp);
 		shader.SetUniformMat4f("model", m_objectStructures[i]->objModel);
 
-		glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
-		shader.SetUniformVec3f("lightPos", lightPos);
+		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		shader.SetUniformVec3f("lightColor", glm::vec3(0.8f, 0.8f, 0.8f));
+		shader.SetUniformVec3f("lightPos", lightPos);
 		shader.SetUniformVec3f("camPos", camera.GetEye());
 
-		m_objectModels[i]->Draw(shader, GL_FILL);
+		m_objectModels[i]->Draw(shader, GL_LINE);
 	}
 }
