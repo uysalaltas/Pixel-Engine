@@ -55,7 +55,14 @@ struct Intersection
 			if (!isnan(IntersectionPoint.x))
 			{
 				triInt.intersectionPointCount += 1;
-				triInt.points.push_back(IntersectionPoint);
+				
+				Point roundedInter = glm::vec3( 
+					(round(IntersectionPoint.x * 100) / 100),
+					(round(IntersectionPoint.y * 100) / 100),
+					(round(IntersectionPoint.z * 100) / 100) 
+				);
+
+				triInt.points.push_back(roundedInter);
 				//outSegTips.push_back(IntersectionPoint);
 				//std::cout << " A: " << glm::to_string(IntersectionPoint) << std::endl;
 			}
@@ -64,7 +71,13 @@ struct Intersection
 			if (!isnan(IntersectionPoint.x))
 			{
 				triInt.intersectionPointCount += 1;
-				triInt.points.push_back(IntersectionPoint);
+				Point roundedInter = glm::vec3(
+					(round(IntersectionPoint.x * 100) / 100),
+					(round(IntersectionPoint.y * 100) / 100),
+					(round(IntersectionPoint.z * 100) / 100)
+				);
+
+				triInt.points.push_back(roundedInter);
 				//outSegTips.push_back(IntersectionPoint);
 				//std::cout << " B: " << glm::to_string(IntersectionPoint) << std::endl;
 			}
@@ -73,7 +86,13 @@ struct Intersection
 			if (!isnan(IntersectionPoint.x))
 			{
 				triInt.intersectionPointCount += 1;
-				triInt.points.push_back(IntersectionPoint);
+				Point roundedInter = glm::vec3(
+					(round(IntersectionPoint.x * 100) / 100),
+					(round(IntersectionPoint.y * 100) / 100),
+					(round(IntersectionPoint.z * 100) / 100)
+				);
+
+				triInt.points.push_back(roundedInter);
 				//outSegTips.push_back(IntersectionPoint);
 				//std::cout << " C: " << glm::to_string(IntersectionPoint) << std::endl;
 			}

@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <vector>
+#include <iostream>
 
 //#include "Window.h"
 
@@ -33,6 +34,7 @@ public:
         , m_width(width)
         , m_height(height)
     {
+        m_eyeInitial = m_eye;
         UpdateViewMatrix();
     }
 
@@ -77,6 +79,11 @@ public:
         float xAngle = deltaX * deltaAngleX;
         float yAngle = deltaY * deltaAngleY;
 
+        xAngleSub += xAngle;
+        yAngleSub += yAngle;
+
+        std::cout << xAngleSub * (180 / M_PI) << " " << yAngleSub * (180 / M_PI) << std::endl;
+
         float cosAngle = glm::dot(GetViewDir(), m_upVector);
         if (cosAngle * glm::sign(yAngle) > 0.99f)
             yAngle = 0;
@@ -94,30 +101,35 @@ public:
 
     void PanCamera(glm::vec2 deltaMouse)
     {
-        glm::vec3 from_lookat_to_eye = m_eye - m_lookAt;
-        
-        float to_eye_len = glm::length(from_lookat_to_eye);
-        
-        glm::vec3 to_eye = {
-            from_lookat_to_eye[0] / to_eye_len,
-            from_lookat_to_eye[1] / to_eye_len,
-            from_lookat_to_eye[2] / to_eye_len
-        };
+        //glm::vec3 from_lookat_to_eye = m_eye - m_lookAt;
+        //std::cout << glm::to_string(from_lookat_to_eye) << std::endl;
+        //
+        //float to_eye_len = glm::length(from_lookat_to_eye);
+        //
+        //glm::vec3 to_eye = {
+        //    from_lookat_to_eye[0] / to_eye_len,
+        //    from_lookat_to_eye[1] / to_eye_len,
+        //    from_lookat_to_eye[2] / to_eye_len
+        //};
+        //glm::vec3 across = {
+        //    -(to_eye[1] * m_upVector[2] - to_eye[2] * m_upVector[1]),
+        //    -(to_eye[2] * m_upVector[0] - to_eye[0] * m_upVector[2]),
+        //    -(to_eye[0] * m_upVector[1] - to_eye[1] * m_upVector[0])
+        //};
+        //glm::vec3 pan_delta = {
+        //    pan_speed * (deltaMouse.x * across[0] + deltaMouse.y * m_upVector[0]),
+        //    pan_speed * (deltaMouse.x * across[1] + deltaMouse.y * m_upVector[1]),
+        //    pan_speed * (deltaMouse.x * across[2] + deltaMouse.y * m_upVector[2]),
+        //};
+        //m_lookAt = m_lookAt + pan_delta;
+        //m_eye = m_eye + pan_delta;
 
-        glm::vec3 across = {
-            -(to_eye[1] * m_upVector[2] - to_eye[2] * m_upVector[1]),
-            -(to_eye[2] * m_upVector[0] - to_eye[0] * m_upVector[2]),
-            -(to_eye[0] * m_upVector[1] - to_eye[1] * m_upVector[0])
-        };
+        float xSub = deltaMouse.x * glm::sin(yAngleSub);
+        float ySub = deltaMouse.x;
+        float zSub = deltaMouse.y * glm::cos(xAngleSub);
 
-        glm::vec3 pan_delta = {
-            pan_speed * (deltaMouse.x * across[0] + deltaMouse.y * m_upVector[0]),
-            pan_speed * (deltaMouse.x * across[1] + deltaMouse.y * m_upVector[1]),
-            pan_speed * (deltaMouse.x * across[2] + deltaMouse.y * m_upVector[2]),
-        };
-
-        m_lookAt = m_lookAt + pan_delta;
-        m_eye = m_eye + pan_delta;
+        m_eye       = glm::vec3(m_eye.x + xSub,            m_eye.y + ySub,            m_eye.z + zSub);
+        m_lookAt    = glm::vec3(m_lookAt.x + xSub,         m_lookAt.y + ySub,         m_lookAt.z + zSub);
 
         UpdateViewMatrix();
     }
@@ -160,10 +172,14 @@ private:
     glm::mat4x4 m_viewMatrix;
     glm::mat4x4 m_projMatrix;
     glm::vec3 m_eye;                // Camera position in 3D
+    glm::vec3 m_eyeInitial;                // Camera position in 3D
     glm::vec3 m_lookAt;             // Point that the camera is looking at
     glm::vec3 m_upVector;           // Orientation of the camera
     float* m_width;
     float* m_height;
     float m_fov = 45;
     float pan_speed = .5f;
+
+    float xAngleSub = 0.0;
+    float yAngleSub = 0.0;
 };

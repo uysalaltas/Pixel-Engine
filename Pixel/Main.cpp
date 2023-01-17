@@ -37,7 +37,7 @@ int main()
 #pragma region OPENGL_SCENE_INIT
 	GLWindow gl_window;
 	Camera camera(
-		glm::vec3(300.0f, 0.0f, platfromSize * 3),
+		glm::vec3(500.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		upVector, &gl_window.WIDTH, &gl_window.HEIGHT
 
